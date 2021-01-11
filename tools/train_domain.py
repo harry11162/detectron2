@@ -120,6 +120,8 @@ def setup(args):
     Create configs and perform basic setups.
     """
     register_coco_instances("domain", {}, "domain/annotations.json", "domain")
+    register_coco_instances("domain_train", {}, "domain/train_annotations.json", "domain")
+    register_coco_instances("domain_test", {}, "domain/test_annotations.json", "domain")
     cfg = get_cfg()
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
