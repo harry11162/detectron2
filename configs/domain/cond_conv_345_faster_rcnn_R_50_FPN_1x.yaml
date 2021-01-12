@@ -1,0 +1,13 @@
+_BASE_: "../Base-RCNN-FPN.yaml"
+MODEL:
+  WEIGHTS: "detectron2://ImageNetPretrained/MSRA/R-50.pkl"
+  MASK_ON: False
+  RESNETS:
+    DEPTH: 50
+    COND_CONV_ON_PER_STAGE: [False, True, True, True]
+SOLVER:
+  IMS_PER_BATCH: 8
+  BASE_LR: 0.01
+DATASETS:
+  TRAIN: ("domain_train",)
+  TEST: ("domain_test",)
