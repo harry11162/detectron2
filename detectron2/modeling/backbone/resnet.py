@@ -11,6 +11,7 @@ from detectron2.layers import (
     Conv2d,
     DeformConv,
     ModulatedDeformConv,
+    CondConv2D,
     ShapeSpec,
     get_norm,
 )
@@ -328,6 +329,104 @@ class DeformBottleneckBlock(CNNBlockBase):
         return out
 
 
+class CondConvBottleneckBlock(CNNBlockBase):
+    """
+    Similar to :class:`BottleneckBlock`, but with CondConv
+    in the 3x3 convolution.
+    """
+
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        *,
+        bottleneck_channels,
+        stride=1,
+        num_groups=1,
+        norm="BN",
+        stride_in_1x1=False,
+        dilation=1,
+        cond_conv_num_experts=8,
+        cond_conv_dropout_rate=0.2,
+    ):
+        super().__init__(in_channels, out_channels, stride)
+        self.cond_conv_num_experts = cond_conv_num_experts
+        self.cond_conv_dropout_rate = cond_conv_dropout_rate
+
+        if in_channels != out_channels:
+            self.shortcut = CondConv2D(
+                in_channels,
+                out_channels,
+                kernel_size=1,
+                stride=stride,
+                bias=False,
+                num_experts=cond_conv_num_experts,
+                dropout_rate=cond_conv_dropout_rate,
+                norm=get_norm(norm, out_channels),
+            )
+        else:
+            self.shortcut = None
+
+        stride_1x1, stride_3x3 = (stride, 1) if stride_in_1x1 else (1, stride)
+
+        self.conv1 = CondConv2D(
+            in_channels,
+            bottleneck_channels,
+            kernel_size=1,
+            stride=stride_1x1,
+            bias=False,
+            num_experts=cond_conv_num_experts,
+            dropout_rate=cond_conv_dropout_rate,
+            norm=get_norm(norm, bottleneck_channels),
+        )
+
+        self.conv2 = CondConv2D(
+            bottleneck_channels,
+            bottleneck_channels,
+            kernel_size=3,
+            stride=stride_3x3,
+            padding=1 * dilation,
+            bias=False,
+            groups=num_groups,
+            dilation=dilation,
+            num_experts=cond_conv_num_experts,
+            dropout_rate=cond_conv_dropout_rate,
+            norm=get_norm(norm, bottleneck_channels),
+        )
+
+        self.conv3 = CondConv2D(
+            bottleneck_channels,
+            out_channels,
+            kernel_size=1,
+            bias=False,
+            num_experts=cond_conv_num_experts,
+            dropout_rate=cond_conv_dropout_rate,
+            norm=get_norm(norm, out_channels),
+        )
+
+        for layer in [self.conv1, self.conv2, self.conv3, self.shortcut]:
+            if layer is not None:  # shortcut can be None
+                weight_init.c2_msra_fill(layer)
+
+    def forward(self, x):
+        out = self.conv1(x)
+        out = F.relu_(out)
+
+        out = self.conv2(out)
+        out = F.relu_(out)
+
+        out = self.conv3(out)
+
+        if self.shortcut is not None:
+            shortcut = self.shortcut(x)
+        else:
+            shortcut = x
+
+        out += shortcut
+        out = F.relu_(out)
+        return out
+
+
 class BasicStem(CNNBlockBase):
     """
     The standard ResNet stem (layers before the first residual block).
@@ -589,6 +688,9 @@ def build_resnet_backbone(cfg, input_shape):
     deform_on_per_stage = cfg.MODEL.RESNETS.DEFORM_ON_PER_STAGE
     deform_modulated    = cfg.MODEL.RESNETS.DEFORM_MODULATED
     deform_num_groups   = cfg.MODEL.RESNETS.DEFORM_NUM_GROUPS
+    cond_conv_on_per_stage = cfg.MODEL.RESNETS.COND_CONV_ON_PER_STAGE
+    cond_conv_num_experts = cfg.MODEL.RESNETS.COND_CONV_NUM_EXPERTS
+    cond_conv_dropout_rate = cfg.MODEL.RESNETS.COND_CONV_DROPOUT_RATE
     # fmt: on
     assert res5_dilation in {1, 2}, "res5_dilation cannot be {}.".format(res5_dilation)
 
@@ -638,6 +740,10 @@ def build_resnet_backbone(cfg, input_shape):
                 stage_kargs["block_class"] = DeformBottleneckBlock
                 stage_kargs["deform_modulated"] = deform_modulated
                 stage_kargs["deform_num_groups"] = deform_num_groups
+            elif cond_conv_on_per_stage[idx]:
+                stage_kargs["block_class"] = CondConvBottleneckBlock
+                stage_kargs["cond_conv_num_experts"] = cond_conv_num_experts
+                stage_kargs["cond_conv_dropout_rate"] = cond_conv_dropout_rate
             else:
                 stage_kargs["block_class"] = BottleneckBlock
         blocks = ResNet.make_stage(**stage_kargs)

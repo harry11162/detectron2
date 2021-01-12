@@ -495,6 +495,10 @@ _C.MODEL.RESNETS.DEFORM_MODULATED = False
 # Number of groups in deformable conv.
 _C.MODEL.RESNETS.DEFORM_NUM_GROUPS = 1
 
+_C.MODEL.RESNETS.COND_CONV_ON_PER_STAGE = [False, False, False, False]
+_C.MODEL.RESNETS.COND_CONV_NUM_EXPERTS = 8
+_C.MODEL.RESNETS.COND_CONV_DROPOUT_RATE = 0.2
+
 
 # ---------------------------------------------------------------------------- #
 # Solver
