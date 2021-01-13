@@ -5,9 +5,7 @@ MODEL:
   RESNETS:
     DEPTH: 50
     COND_CONV_ON_PER_STAGE: [False, False, False, True]
-SOLVER:
-  IMS_PER_BATCH: 16
-  BASE_LR: 0.02
+    COND_CONV_DROPOUT_RATE: 0.
 DATASETS:
   TRAIN: ("domain_train",)
   TEST: ("domain_test",)
