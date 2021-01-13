@@ -7,6 +7,9 @@ inference_test_output
 cond_conv_5
 logs
 
+# my custom data dir
+domain
+
 
 *.png
 *.json
