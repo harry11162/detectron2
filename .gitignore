@@ -3,6 +3,10 @@ output
 instant_test_output
 inference_test_output
 
+# my custom output dirs
+cond_conv_5
+logs
+
 
 *.png
 *.json
