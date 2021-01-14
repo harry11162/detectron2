@@ -104,6 +104,14 @@ class CondConv2D(_ConvNd):
             input = input.unsqueeze(0)
             pooled_inputs = self._avg_pooling(input)
             routing_weights = self._routing_fn(pooled_inputs)
+
+            # get weights to analyse
+            x = routing_weights.reshape(-1).detach().cpu().tolist()
+            string = ''
+            for i in x:
+                string = string + ' {}'.format(i)
+            print(string.strip())
+
             kernels = torch.sum(routing_weights[: ,None, None, None, None] * self.weight, 0)
             out = self._conv_forward(input, kernels)
             res.append(out)
