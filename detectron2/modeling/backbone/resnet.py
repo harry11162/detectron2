@@ -543,7 +543,6 @@ class ResNet(Backbone):
             x = self.linear(x)
             if "linear" in self._out_features:
                 outputs["linear"] = x
-        print('end')
         return outputs
 
     def output_shape(self):
