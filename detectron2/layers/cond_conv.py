@@ -1,123 +1,88 @@
-# Implement from https://github.com/nibuiro/CondConv-pytorch
-import functools
-
 import torch
-from torch import nn
+import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn.modules.conv import _ConvNd
-from torch.nn.modules.utils import _pair
-from torch.nn.parameter import Parameter
+import math
 
 
-class _routing(nn.Module):
+class route_func(nn.Module):
+    r"""CondConv: Conditionally Parameterized Convolutions for Efficient Inference
+    https://papers.nips.cc/paper/8412-condconv-conditionally-parameterized-convolutions-for-efficient-inference.pdf
+    Args:
+        c_in (int): Number of channels in the input image
+        num_experts (int): Number of experts for mixture. Default: 1
+    """
 
-    def __init__(self, in_channels, num_experts, dropout_rate):
-        super(_routing, self).__init__()
-        
-        self.dropout = nn.Dropout(dropout_rate)
-        self.fc = nn.Linear(in_channels, num_experts)
+    def __init__(self, c_in, num_experts):
+        super(route_func, self).__init__()
+        self.avgpool = nn.AdaptiveAvgPool2d(output_size=1)
+        self.fc = nn.Linear(c_in, num_experts)
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        x = torch.flatten(x)
-        x = self.dropout(x)
+        x = self.avgpool(x)
+        x = x.view(x.size(0), -1)
         x = self.fc(x)
-        return F.sigmoid(x)
-    
+        x = self.sigmoid(x)
+        return x
 
-class CondConv2D(_ConvNd):
-    r"""Learn specialized convolutional kernels for each example.
-    As described in the paper
-    `CondConv: Conditionally Parameterized Convolutions for Efficient Inference`_ ,
-    conditionally parameterized convolutions (CondConv), 
-    which challenge the paradigm of static convolutional kernels 
-    by computing convolutional kernels as a function of the input.
+
+class CondConv2d(nn.Module):
+    r"""CondConv: Conditionally Parameterized Convolutions for Efficient Inference
+    https://papers.nips.cc/paper/8412-condconv-conditionally-parameterized-convolutions-for-efficient-inference.pdf
     Args:
         in_channels (int): Number of channels in the input image
         out_channels (int): Number of channels produced by the convolution
         kernel_size (int or tuple): Size of the convolving kernel
         stride (int or tuple, optional): Stride of the convolution. Default: 1
         padding (int or tuple, optional): Zero-padding added to both sides of the input. Default: 0
-        padding_mode (string, optional): ``'zeros'``, ``'reflect'``, ``'replicate'`` or ``'circular'``. Default: ``'zeros'``
         dilation (int or tuple, optional): Spacing between kernel elements. Default: 1
         groups (int, optional): Number of blocked connections from input channels to output channels. Default: 1
         bias (bool, optional): If ``True``, adds a learnable bias to the output. Default: ``True``
-        num_experts (int): Number of experts per layer 
-    Shape:
-        - Input: :math:`(N, C_{in}, H_{in}, W_{in})`
-        - Output: :math:`(N, C_{out}, H_{out}, W_{out})` where
-          .. math::
-              H_{out} = \left\lfloor\frac{H_{in}  + 2 \times \text{padding}[0] - \text{dilation}[0]
-                        \times (\text{kernel\_size}[0] - 1) - 1}{\text{stride}[0]} + 1\right\rfloor
-          .. math::
-              W_{out} = \left\lfloor\frac{W_{in}  + 2 \times \text{padding}[1] - \text{dilation}[1]
-                        \times (\text{kernel\_size}[1] - 1) - 1}{\text{stride}[1]} + 1\right\rfloor
-    Attributes:
-        weight (Tensor): the learnable weights of the module of shape
-                         :math:`(\text{out\_channels}, \frac{\text{in\_channels}}{\text{groups}},`
-                         :math:`\text{kernel\_size[0]}, \text{kernel\_size[1]})`.
-                         The values of these weights are sampled from
-                         :math:`\mathcal{U}(-\sqrt{k}, \sqrt{k})` where
-                         :math:`k = \frac{groups}{C_\text{in} * \prod_{i=0}^{1}\text{kernel\_size}[i]}`
-        bias (Tensor):   the learnable bias of the module of shape (out_channels). If :attr:`bias` is ``True``,
-                         then the values of these weights are
-                         sampled from :math:`\mathcal{U}(-\sqrt{k}, \sqrt{k})` where
-                         :math:`k = \frac{groups}{C_\text{in} * \prod_{i=0}^{1}\text{kernel\_size}[i]}`
-    .. _CondConv: Conditionally Parameterized Convolutions for Efficient Inference:
-       https://arxiv.org/abs/1904.04971
+        num_experts (int): Number of experts for mixture. Default: 1
     """
 
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1,
-                 padding=0, dilation=1, groups=1,
-                 bias=True, padding_mode='zeros', num_experts=3, dropout_rate=0.2,
-                 norm=None, activation=None):
-        kernel_size = _pair(kernel_size)
-        stride = _pair(stride)
-        padding = _pair(padding)
-        dilation = _pair(dilation)
-        super(CondConv2D, self).__init__(
-            in_channels, out_channels, kernel_size, stride, padding, dilation,
-            False, _pair(0), groups, bias, padding_mode)
+    def __init__(self, in_channels, out_channels, kernel_size,
+                 stride=1, padding=0, dilation=1, groups=1, bias=True,
+                 num_experts=1):
+        super(CondConv2d, self).__init__()
 
-        self._avg_pooling = functools.partial(F.adaptive_avg_pool2d, output_size=(1, 1))
-        self._routing_fn = _routing(in_channels, num_experts, dropout_rate)
-        
-        self.weight = Parameter(torch.Tensor(
-            num_experts, out_channels, in_channels // groups, *kernel_size))
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.kernel_size = kernel_size
+        self.stride = stride
+        self.padding = padding
+        self.dilation = dilation
+        self.groups = groups
+        self.num_experts = num_experts
 
-        self.norm = norm
-        self.activation = activation
-        
-        self.reset_parameters()
+        self.weight = nn.Parameter(
+            torch.Tensor(num_experts, out_channels, in_channels // groups, kernel_size, kernel_size))
+        if bias:
+            self.bias = nn.Parameter(torch.Tensor(num_experts, out_channels))
+        else:
+            self.register_parameter('bias', None)
 
-    def _conv_forward(self, input, weight):
-        if self.padding_mode != 'zeros':
-            return F.conv2d(F.pad(input, self._padding_repeated_twice, mode=self.padding_mode),
-                            weight, self.bias, self.stride,
-                            _pair(0), self.dilation, self.groups)
-        return F.conv2d(input, weight, self.bias, self.stride,
-                        self.padding, self.dilation, self.groups)
-    
-    def forward(self, inputs):
-        b, _, _, _ = inputs.size()
-        res = []
-        for input in inputs:
-            input = input.unsqueeze(0)
-            pooled_inputs = self._avg_pooling(input)
-            routing_weights = self._routing_fn(pooled_inputs)
+        nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
+        if self.bias is not None:
+            fan_in, _ = nn.init._calculate_fan_in_and_fan_out(self.weight)
+            bound = 1 / math.sqrt(fan_in)
+            nn.init.uniform_(self.bias, -bound, bound)
 
-            # get weights to analyse
-            x = routing_weights.reshape(-1).detach().cpu().tolist()
-            string = ''
-            for i in x:
-                string = string + ' {}'.format(i)
-            print(string.strip())
+    def forward(self, x, routing_weight):
+        b, c_in, h, w = x.size()
+        k, c_out, c_in, kh, kw = self.weight.size()
+        x = x.view(1, -1, h, w)
+        weight = self.weight.view(k, -1)
+        combined_weight = torch.mm(routing_weight, weight).view(-1, c_in, kh, kw)
+        if self.bias is not None:
+            combined_bias = torch.mm(routing_weight, self.bias).view(-1)
+            output = F.conv2d(
+                x, weight=combined_weight, bias=combined_bias, stride=self.stride, padding=self.padding,
+                dilation=self.dilation, groups=self.groups * b)
+        else:
+            output = F.conv2d(
+                x, weight=combined_weight, bias=None, stride=self.stride, padding=self.padding,
+                dilation=self.dilation, groups=self.groups * b)
 
-            kernels = torch.sum(routing_weights[: ,None, None, None, None] * self.weight, 0)
-            out = self._conv_forward(input, kernels)
-            res.append(out)
-        res = torch.cat(res, dim=0)
-        if self.norm is not None:
-            res = self.norm(res)
-        if self.activation is not None:
-            res = self.activation(res)
-        return res
+        output = output.view(b, c_out, output.size(-2), output.size(-1))
+        return output
