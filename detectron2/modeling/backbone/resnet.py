@@ -11,7 +11,7 @@ from detectron2.layers import (
     Conv2d,
     DeformConv,
     ModulatedDeformConv,
-    CondConv2D,
+    CondConv2d,
     ShapeSpec,
     get_norm,
 )
@@ -354,7 +354,7 @@ class CondConvBottleneckBlock(CNNBlockBase):
         self.cond_conv_dropout_rate = cond_conv_dropout_rate
 
         if in_channels != out_channels:
-            self.shortcut = CondConv2D(
+            self.shortcut = CondConv2d(
                 in_channels,
                 out_channels,
                 kernel_size=1,
@@ -369,7 +369,7 @@ class CondConvBottleneckBlock(CNNBlockBase):
 
         stride_1x1, stride_3x3 = (stride, 1) if stride_in_1x1 else (1, stride)
 
-        self.conv1 = CondConv2D(
+        self.conv1 = CondConv2d(
             in_channels,
             bottleneck_channels,
             kernel_size=1,
@@ -380,7 +380,7 @@ class CondConvBottleneckBlock(CNNBlockBase):
             norm=get_norm(norm, bottleneck_channels),
         )
 
-        self.conv2 = CondConv2D(
+        self.conv2 = CondConv2d(
             bottleneck_channels,
             bottleneck_channels,
             kernel_size=3,
@@ -394,7 +394,7 @@ class CondConvBottleneckBlock(CNNBlockBase):
             norm=get_norm(norm, bottleneck_channels),
         )
 
-        self.conv3 = CondConv2D(
+        self.conv3 = CondConv2d(
             bottleneck_channels,
             out_channels,
             kernel_size=1,
