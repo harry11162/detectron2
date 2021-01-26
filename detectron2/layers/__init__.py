@@ -9,6 +9,6 @@ from .shape_spec import ShapeSpec
 from .wrappers import BatchNorm2d, Conv2d, ConvTranspose2d, cat, interpolate, Linear, nonzero_tuple
 from .blocks import CNNBlockBase, DepthwiseSeparableConv2d
 from .aspp import ASPP
-from .cond_conv import CondConv2D
+from .cond_conv import CondConv2d
 
 __all__ = [k for k in globals().keys() if not k.startswith("_")]
