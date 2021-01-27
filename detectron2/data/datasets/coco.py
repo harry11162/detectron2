@@ -157,6 +157,10 @@ Category ids in annotations are not in [1, #categories]! We'll apply a mapping f
         record["width"] = img_dict["width"]
         image_id = record["image_id"] = img_dict["id"]
 
+        # add my custom metadata
+        if "date_captured" in img_dict:
+            record["date_captured"] = img_dict["date_captured"]
+
         objs = []
         for anno in anno_dict_list:
             # Check that the image_id in this annotation is the same as
@@ -344,11 +348,6 @@ def convert_to_coco_dict(dataset_name):
             "height": int(image_dict["height"]),
             "file_name": str(image_dict["file_name"]),
         }
-        # add my custom metadata into it
-        import pdb
-        pdb.set_trace()
-        if ["date_captured"] in image_dict:
-            coco_image.update({"date_captured": image_dict["date_captured"]})
         coco_images.append(coco_image)
 
         anns_per_image = image_dict.get("annotations", [])
