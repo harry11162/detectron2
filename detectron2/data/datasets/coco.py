@@ -344,6 +344,9 @@ def convert_to_coco_dict(dataset_name):
             "height": int(image_dict["height"]),
             "file_name": str(image_dict["file_name"]),
         }
+        # add my custom metadata into it
+        if ["date_captured"] in image_dict:
+            coco_image.update({"date_captured": image_dict["date_captured"]})
         coco_images.append(coco_image)
 
         anns_per_image = image_dict.get("annotations", [])
