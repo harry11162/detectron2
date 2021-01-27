@@ -345,6 +345,8 @@ def convert_to_coco_dict(dataset_name):
             "file_name": str(image_dict["file_name"]),
         }
         # add my custom metadata into it
+        import pdb
+        pdb.set_trace()
         if ["date_captured"] in image_dict:
             coco_image.update({"date_captured": image_dict["date_captured"]})
         coco_images.append(coco_image)
