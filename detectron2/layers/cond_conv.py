@@ -43,7 +43,7 @@ class CondConv2d(nn.Module):
 
     def __init__(self, in_channels, out_channels, kernel_size,
                  stride=1, padding=0, dilation=1, groups=1, bias=True,
-                 num_experts=1):
+                 num_experts=1, norm=None):
         super(CondConv2d, self).__init__()
 
         self.in_channels = in_channels
@@ -68,6 +68,8 @@ class CondConv2d(nn.Module):
             bound = 1 / math.sqrt(fan_in)
             nn.init.uniform_(self.bias, -bound, bound)
 
+        self.norm = norm
+
     def forward(self, x, routing_weight):
         b, c_in, h, w = x.size()
         k, c_out, c_in, kh, kw = self.weight.size()
@@ -85,4 +87,6 @@ class CondConv2d(nn.Module):
                 dilation=self.dilation, groups=self.groups * b)
 
         output = output.view(b, c_out, output.size(-2), output.size(-1))
+        if self.norm is not None:
+            output = self.norm(output)
         return output
