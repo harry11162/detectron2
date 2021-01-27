@@ -12,6 +12,7 @@ from detectron2.layers import (
     DeformConv,
     ModulatedDeformConv,
     CondConv2d,
+    route_func,
     ShapeSpec,
     get_norm,
 )
@@ -347,11 +348,16 @@ class CondConvBottleneckBlock(CNNBlockBase):
         stride_in_1x1=False,
         dilation=1,
         cond_conv_num_experts=8,
-        cond_conv_dropout_rate=0.2,
+        cond_conv_dropout_rate=0.0,
     ):
         super().__init__(in_channels, out_channels, stride)
         self.cond_conv_num_experts = cond_conv_num_experts
         self.cond_conv_dropout_rate = cond_conv_dropout_rate
+
+        self.route_func = nn.Sequential(
+            route_func(in_channels, cond_conv_num_experts),
+            nn.Dropout(p=cond_conv_dropout_rate),
+        )
 
         if in_channels != out_channels:
             self.shortcut = CondConv2d(
@@ -361,7 +367,6 @@ class CondConvBottleneckBlock(CNNBlockBase):
                 stride=stride,
                 bias=False,
                 num_experts=cond_conv_num_experts,
-                dropout_rate=cond_conv_dropout_rate,
                 norm=get_norm(norm, out_channels),
             )
         else:
@@ -376,7 +381,6 @@ class CondConvBottleneckBlock(CNNBlockBase):
             stride=stride_1x1,
             bias=False,
             num_experts=cond_conv_num_experts,
-            dropout_rate=cond_conv_dropout_rate,
             norm=get_norm(norm, bottleneck_channels),
         )
 
@@ -390,7 +394,6 @@ class CondConvBottleneckBlock(CNNBlockBase):
             groups=num_groups,
             dilation=dilation,
             num_experts=cond_conv_num_experts,
-            dropout_rate=cond_conv_dropout_rate,
             norm=get_norm(norm, bottleneck_channels),
         )
 
@@ -400,7 +403,6 @@ class CondConvBottleneckBlock(CNNBlockBase):
             kernel_size=1,
             bias=False,
             num_experts=cond_conv_num_experts,
-            dropout_rate=cond_conv_dropout_rate,
             norm=get_norm(norm, out_channels),
         )
 
@@ -409,16 +411,18 @@ class CondConvBottleneckBlock(CNNBlockBase):
                 weight_init.c2_msra_fill(layer)
 
     def forward(self, x):
-        out = self.conv1(x)
+        routing_weight = self.route_func(x)
+
+        out = self.conv1(x, routing_weight)
         out = F.relu_(out)
 
-        out = self.conv2(out)
+        out = self.conv2(out, routing_weight)
         out = F.relu_(out)
 
-        out = self.conv3(out)
+        out = self.conv3(out, routing_weight)
 
         if self.shortcut is not None:
-            shortcut = self.shortcut(x)
+            shortcut = self.shortcut(x, routing_weight)
         else:
             shortcut = x
 
