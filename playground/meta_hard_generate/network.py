@@ -53,7 +53,7 @@ class MyNetwork(nn.Module):
         backbone = build_meta_cond_conv_resnet_backbone(cfg, ShapeSpec(channels=3))
         self.backbone = build_custom_backbone_fpn(cfg, backbone)
         self.proposal_generator = build_proposal_generator(cfg, self.backbone.output_shape())
-        self.roi_heads = build_roi_heads(cfg, self.backbone.output_shape()),
+        self.roi_heads = build_roi_heads(cfg, self.backbone.output_shape())
 
         self.input_format = cfg.INPUT.FORMAT
         self.vis_period = cfg.VIS_PERIOD
