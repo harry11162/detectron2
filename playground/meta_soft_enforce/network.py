@@ -160,9 +160,11 @@ class MyNetwork(nn.Module):
         if self.weight_memory_bank is None:
             self.time_memory_bank = metas
             self.weight_memory_bank = routing_weights
+            correlation_loss = None
         elif self.weight_memory_bank.size()[0] < self.memory_bank_size:
             self.time_memory_bank = torch.cat([self.time_memory_bank, metas])
             self.weight_memory_bank = torch.cat([self.weight_memory_bank, routing_weights])
+            correlation_loss = None
         else:
             # compute correlation loss
             B, C = routing_weights.size()[0]
@@ -205,7 +207,8 @@ class MyNetwork(nn.Module):
         losses = {}
         losses.update(detector_losses)
         losses.update(proposal_losses)
-        losses.update(correlation_loss)
+        if correlation_loss is not None:
+            losses.update(correlation_loss)
         return losses
 
     def inference(
