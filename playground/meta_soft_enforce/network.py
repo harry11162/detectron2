@@ -194,8 +194,8 @@ class MyNetwork(nn.Module):
         B, C = routing_weights.size()
         # metas (B, 1)
         # routing weights (B, C)
-        time_distance1 = (metas - meta.reshape(1, B)) ** 2  # (B, B)
-        time_distance2 = (metas - meta.reshape(1, B) + 1.) ** 2
+        time_distance1 = (metas - metas.reshape(1, B)) ** 2  # (B, B)
+        time_distance2 = (metas - metas.reshape(1, B) + 1.) ** 2
         time_distance = torch.stack([time_distance1, time_distance2]).min(dim=0).values
         time_distance = time_distance.reshape(B*B)
         
