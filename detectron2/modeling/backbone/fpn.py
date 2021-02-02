@@ -112,11 +112,13 @@ class FPN(Backbone):
     def size_divisibility(self):
         return self._size_divisibility
 
-    def forward(self, x):
+    def forward(self, x, features=None):
         """
         Args:
             input (dict[str->Tensor]): mapping feature map name (e.g., "res5") to
                 feature map tensor for each feature level in high to low resolution order.
+            features : in some experiments, we compute features ourselves.
+                        Using this argument bypasses self.bottom_up module.
 
         Returns:
             dict[str->Tensor]:
@@ -125,7 +127,10 @@ class FPN(Backbone):
                 paper convention: "p<stage>", where stage has stride = 2 ** stage e.g.,
                 ["p2", "p3", ..., "p6"].
         """
-        bottom_up_features = self.bottom_up(x)
+        if features is not None:
+            bottom_up_features = features
+        else:
+            bottom_up_features = self.bottom_up(x)
         results = []
         prev_features = self.lateral_convs[0](bottom_up_features[self.in_features[-1]])
         results.append(self.output_convs[0](prev_features))
