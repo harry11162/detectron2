@@ -141,7 +141,7 @@ class MyNetwork(nn.Module):
         for i in batched_inputs:
             time_captured = i["date_captured"]
             time_captured = datetime.fromtimestamp(time_captured / 1e9)
-            time_captured = time_captured.astimezone(pytz.timezone("PST"))
+            time_captured = time_captured.astimezone(pytz.timezone("US/Pacific"))
             hour = time_captured.hour
             minute = time_captured.minute
             second = time_captured.second
@@ -200,7 +200,7 @@ class MyNetwork(nn.Module):
         for i in batched_inputs:
             time_captured = i["date_captured"]
             time_captured = datetime.fromtimestamp(time_captured / 1e9)
-            time_captured = time_captured.astimezone(pytz.timezone("PST"))
+            time_captured = time_captured.astimezone(pytz.timezone("US/Pacific"))
             hour = time_captured.hour
             minute = time_captured.minute
             second = time_captured.second
