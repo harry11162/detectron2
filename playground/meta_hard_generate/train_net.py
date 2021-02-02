@@ -160,6 +160,7 @@ def do_train(cfg, model, resume=False):
             storage.iter = iteration
 
             loss_dict = model(data)
+            print(loss_dict)
             losses = sum(loss_dict.values())
             assert torch.isfinite(losses).all(), loss_dict
 
