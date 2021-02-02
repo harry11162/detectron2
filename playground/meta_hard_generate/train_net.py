@@ -160,7 +160,6 @@ def do_train(cfg, model, resume=False):
             storage.iter = iteration
 
             loss_dict = model(data)
-            print(loss_dict)
             losses = sum(loss_dict.values())
             assert torch.isfinite(losses).all(), loss_dict
 
@@ -215,6 +214,7 @@ def main(args):
     cfg = setup(args)
 
     model = MyNetwork(cfg)
+    model.to(torch.device(cfg.MODEL.DEVICE))
     logger.info("Model:\n{}".format(model))
     if args.eval_only:
         DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
