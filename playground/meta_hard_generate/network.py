@@ -146,7 +146,7 @@ class MyNetwork(nn.Module):
             minute = time_captured.minute
             second = time_captured.second
             meta = (((second / 60 + minute) / 60) + hour) / 24
-            metas.append(meta)
+            metas.append([meta])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
         features = self.backbone.bottom_up(images.tensor, metas)  # the real backbone
@@ -206,7 +206,7 @@ class MyNetwork(nn.Module):
             minute = time_captured.minute
             second = time_captured.second
             meta = (((second / 60 + minute) / 60) + hour) / 24
-            metas.append(meta)
+            metas.append([meta])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
         features = self.backbone.bottom_up(images.tensor, metas)  # the real backbone
@@ -226,7 +226,7 @@ class MyNetwork(nn.Module):
 
         if do_postprocess:
             assert not torch.jit.is_scripting(), "Scripting is not supported for postprocess."
-            return GeneralizedRCNN._postprocess(results, batched_inputs, images.image_sizes)
+            return MyNetwork._postprocess(results, batched_inputs, images.image_sizes)
         else:
             return results
 
