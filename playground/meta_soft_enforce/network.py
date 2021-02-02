@@ -62,7 +62,7 @@ class MyNetwork(nn.Module):
 
         self.weight_memory_bank = None
         self.time_memory_bank = None
-        self.memory_bank_size = 128
+        self.memory_bank_size = 64
 
         self.register_buffer("pixel_mean", torch.Tensor(cfg.MODEL.PIXEL_MEAN).view(-1, 1, 1))
         self.register_buffer("pixel_std", torch.Tensor(cfg.MODEL.PIXEL_STD).view(-1, 1, 1))
