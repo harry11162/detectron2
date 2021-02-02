@@ -139,7 +139,7 @@ class MyNetwork(nn.Module):
         metas = []
         for i in batched_inputs:
             time_captured = i["date_captured"]
-            time_captured = datetime(time_captured / 1e9)
+            time_captured = datetime.fromtimestamp(time_captured / 1e9)
             time_captured = time_captured.astimezone(datetime.tzinfo.utoffset(-8))
             hour = time_captured.hour
             minute = time_captured.minute
