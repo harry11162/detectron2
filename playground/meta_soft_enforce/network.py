@@ -175,11 +175,13 @@ class MyNetwork(nn.Module):
             # self.weight_memory_bank (M, C)
             time_distance1 = (metas - self.time_memory_bank.reshape(1, M)) ** 2  # (B, M)
             time_distance2 = (metas - self.time_memory_bank.reshape(1, M) + 1.) ** 2
-            time_distance = torch.stack([time_distance1, time_distance2]).min(dim=0).values.reshape(B*M)
+            time_distance = torch.stack([time_distance1, time_distance2]).min(dim=0).values
+            time_distance = time_distance.reshape(B*M)
             
             cosine_sim = (routing_weights.reshape(B, 1, C) * self.weight_memory_bank.reshape(1, M, C)).sum(dim=2)
             cosine_sim = cosine_sim / torch.sqrt(routing_weights.reshape(B, 1, C).sum(dim=2))
-            cosine_sim = cosine_sim / torch.sqrt(self.weight_memory_bank.reshape(1, M, C).sum(dim=2)).reshape(B*M)
+            cosine_sim = cosine_sim / torch.sqrt(self.weight_memory_bank.reshape(1, M, C).sum(dim=2))
+            cosine_sim = cosine_sim.reshape(B*M)
 
             cov = ((time_distance - time_distance.mean()) * (cosine_sim - cosine_sim.mean())).sum()
             corr_coef = cov / time_distance.std() / cosine_sim.std()
