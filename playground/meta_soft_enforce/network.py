@@ -175,7 +175,7 @@ class MyNetwork(nn.Module):
             # self.weight_memory_bank (M, C)
             time_distance1 = (metas - self.time_memory_bank.reshape(1, M)) ** 2  # (B, M)
             time_distance2 = (metas - self.time_memory_bank.reshape(1, M) + 1.) ** 2
-            time_distance = torch.stack([time_distance1, time_distance2]).min(dim=0).value.reshape(B*M)
+            time_distance = torch.stack([time_distance1, time_distance2]).min(dim=0).values.reshape(B*M)
             
             cosine_sim = (routing_weights.reshape(B, 1, C) * self.routing_weights.reshape(1, M, C)).sum(dim=2)
             cosine_sim = cosine_sim / torch.sqrt(self.routing_weights.reshape(B, 1, C).sum(dim=2))
