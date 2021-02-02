@@ -206,6 +206,7 @@ class MyNetwork(nn.Module):
 
         cov = ((time_distance - time_distance.mean()) * (cosine_sim - cosine_sim.mean())).sum()
         corr_coef = cov / time_distance.std() / cosine_sim.std()
+        print(corr_coef)
         correlation_loss = {"correlation_loss": (1 - corr_coef) * 0.01}
 
 
