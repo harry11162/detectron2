@@ -21,11 +21,11 @@ from detectron2.modeling.proposal_generator import build_proposal_generator
 from detectron2.modeling.roi_heads import build_roi_heads
 from detectron2.modeling.meta_arch.build import META_ARCH_REGISTRY
 
-__all__ = ["GeneralizedRCNN"]
+__all__ = ["MyNetwork"]
 
 
 @META_ARCH_REGISTRY.register()
-class GeneralizedRCNN(nn.Module):
+class MyNetwork(nn.Module):
     """
     Generalized R-CNN. Any models that contains the following three components:
     1. Per-image feature extraction (aka backbone)

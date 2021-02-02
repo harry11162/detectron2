@@ -56,7 +56,7 @@ from detectron2.utils.events import (
     TensorboardXWriter,
 )
 
-from network import GeneralizedRCNN
+from network import MyNetwork
 
 logger = logging.getLogger("detectron2")
 
@@ -157,8 +157,6 @@ def do_train(cfg, model, resume=False):
     logger.info("Starting training from iteration {}".format(start_iter))
     with EventStorage(start_iter) as storage:
         for data, iteration in zip(data_loader, range(start_iter, max_iter)):
-            import ipdb
-            ipdb.set_trace()
             storage.iter = iteration
 
             loss_dict = model(data)
@@ -215,7 +213,7 @@ def setup(args):
 def main(args):
     cfg = setup(args)
 
-    model = GeneralizedRCNN(cfg)
+    model = MyNetwork(cfg)
     logger.info("Model:\n{}".format(model))
     if args.eval_only:
         DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
