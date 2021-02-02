@@ -62,7 +62,7 @@ class MyNetwork(nn.Module):
 
         self.weight_memory_bank = None
         self.time_memory_bank = None
-        self.memory_bank_size = 64
+        # self.memory_bank_size = 64
 
         self.register_buffer("pixel_mean", torch.Tensor(cfg.MODEL.PIXEL_MEAN).view(-1, 1, 1))
         self.register_buffer("pixel_std", torch.Tensor(cfg.MODEL.PIXEL_STD).view(-1, 1, 1))
@@ -157,39 +157,56 @@ class MyNetwork(nn.Module):
         routing_weights = features["routing_weights"]
         features = self.backbone(None, features=features)  # FPN
 
-        if self.weight_memory_bank is None:
-            self.time_memory_bank = metas
-            self.weight_memory_bank = routing_weights
-            correlation_loss = None
-        elif self.weight_memory_bank.size()[0] < self.memory_bank_size:
-            self.time_memory_bank = torch.cat([self.time_memory_bank, metas])
-            self.weight_memory_bank = torch.cat([self.weight_memory_bank, routing_weights])
-            correlation_loss = None
-        else:
-            # compute correlation loss
-            B, C = routing_weights.size()
-            M = self.weight_memory_bank.size()[0]
-            # metas (B, 1)
-            # self.time_memory_bank (M, 1)
-            # routing weights (B, C)
-            # self.weight_memory_bank (M, C)
-            time_distance1 = (metas - self.time_memory_bank.reshape(1, M)) ** 2  # (B, M)
-            time_distance2 = (metas - self.time_memory_bank.reshape(1, M) + 1.) ** 2
-            time_distance = torch.stack([time_distance1, time_distance2]).min(dim=0).values
-            time_distance = time_distance.reshape(B*M)
-            
-            cosine_sim = (routing_weights.reshape(B, 1, C) * self.weight_memory_bank.reshape(1, M, C)).sum(dim=2)
-            cosine_sim = cosine_sim / torch.sqrt(routing_weights.reshape(B, 1, C).sum(dim=2))
-            cosine_sim = cosine_sim / torch.sqrt(self.weight_memory_bank.reshape(1, M, C).sum(dim=2))
-            cosine_sim = cosine_sim.reshape(B*M)
+        # if self.weight_memory_bank is None:
+        #     self.time_memory_bank = metas
+        #     self.weight_memory_bank = routing_weights
+        #     correlation_loss = None
+        # elif self.weight_memory_bank.size()[0] < self.memory_bank_size:
+        #     self.time_memory_bank = torch.cat([self.time_memory_bank, metas])
+        #     self.weight_memory_bank = torch.cat([self.weight_memory_bank, routing_weights])
+        #     correlation_loss = None
+        # else:
+        #     # compute correlation loss
+        #     B, C = routing_weights.size()
+        #     M = self.weight_memory_bank.size()[0]
+        #     # metas (B, 1)
+        #     # self.time_memory_bank (M, 1)
+        #     # routing weights (B, C)
+        #     # self.weight_memory_bank (M, C)
+        #     time_distance1 = (metas - self.time_memory_bank.reshape(1, M)) ** 2  # (B, M)
+        #     time_distance2 = (metas - self.time_memory_bank.reshape(1, M) + 1.) ** 2
+        #     time_distance = torch.stack([time_distance1, time_distance2]).min(dim=0).values
+        #     time_distance = time_distance.reshape(B*M)
+        #     
+        #     cosine_sim = (routing_weights.reshape(B, 1, C) * self.weight_memory_bank.reshape(1, M, C)).sum(dim=2)
+        #     cosine_sim = cosine_sim / torch.sqrt(routing_weights.reshape(B, 1, C).sum(dim=2))
+        #     cosine_sim = cosine_sim / torch.sqrt(self.weight_memory_bank.reshape(1, M, C).sum(dim=2))
+        #     cosine_sim = cosine_sim.reshape(B*M)
 
-            cov = ((time_distance - time_distance.mean()) * (cosine_sim - cosine_sim.mean())).sum()
-            corr_coef = cov / time_distance.std() / cosine_sim.std()
-            correlation_loss = {"correlation_loss": 1 - corr_coef}
+        #     cov = ((time_distance - time_distance.mean()) * (cosine_sim - cosine_sim.mean())).sum()
+        #     corr_coef = cov / time_distance.std() / cosine_sim.std()
+        #     correlation_loss = {"correlation_loss": 1 - corr_coef}
 
-            # update bank
-            self.time_memory_bank = torch.cat([self.time_memory_bank[B:], metas])
-            self.weight_memory_bank = torch.cat([self.weight_memory_bank[B:], routing_weights])
+        #     # update bank
+        #     self.time_memory_bank = torch.cat([self.time_memory_bank[B:], metas])
+        #     self.weight_memory_bank = torch.cat([self.weight_memory_bank[B:], routing_weights])
+
+        B, C = routing_weights.size()
+        # metas (B, 1)
+        # routing weights (B, C)
+        time_distance1 = (metas - meta.reshape(1, B)) ** 2  # (B, B)
+        time_distance2 = (metas - meta.reshape(1, B) + 1.) ** 2
+        time_distance = torch.stack([time_distance1, time_distance2]).min(dim=0).values
+        time_distance = time_distance.reshape(B*B)
+        
+        cosine_sim = (routing_weights.reshape(B, 1, C) * routing_weights.reshape(1, B, C)).sum(dim=2)
+        cosine_sim = cosine_sim / torch.sqrt(routing_weights.reshape(B, 1, C).sum(dim=2))
+        cosine_sim = cosine_sim / torch.sqrt(routing_weights.reshape(1, B, C).sum(dim=2))
+        cosine_sim = cosine_sim.reshape(B*B)
+
+        cov = ((time_distance - time_distance.mean()) * (cosine_sim - cosine_sim.mean())).sum()
+        corr_coef = cov / time_distance.std() / cosine_sim.std()
+        correlation_loss = {"correlation_loss": 1 - corr_coef}
 
 
 
