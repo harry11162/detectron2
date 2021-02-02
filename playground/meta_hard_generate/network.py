@@ -49,6 +49,7 @@ class MyNetwork(nn.Module):
         """
         super().__init__()
         self.backbone = build_meta_cond_conv_resnet_backbone(cfg, ShapeSpec(channels=3))
+        print([i for i in self.backbone.output_shape()])
         self.proposal_generator = build_proposal_generator(cfg, self.backbone.output_shape()),
         self.roi_heads = build_roi_heads(cfg, self.backbone.output_shape()),
 
