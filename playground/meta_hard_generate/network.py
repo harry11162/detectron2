@@ -206,9 +206,7 @@ class MyNetwork(nn.Module):
             second = time_captured.second
             meta = (((second / 60 + minute) / 60) + hour) / 24
             metas.append(meta)
-        metas = torch.Tensor(metas)
-        metas = metas.
-        metas = , dtype=images.tensor.dtype, device=images.tensor.device)
+        metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
         features = self.backbone(images.tensor, metas)
 
