@@ -1,7 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
 import logging
 import numpy as np
-from datetime import datetime
+from datetime import datetime, tzinfo
 from typing import Dict, List, Optional, Tuple
 import torch
 from torch import nn
@@ -140,7 +140,7 @@ class MyNetwork(nn.Module):
         for i in batched_inputs:
             time_captured = i["date_captured"]
             time_captured = datetime.fromtimestamp(time_captured / 1e9)
-            time_captured = time_captured.astimezone(datetime.tzinfo.utoffset(-8))
+            time_captured = time_captured.astimezone(tzinfo.utcoffset(-8))
             hour = time_captured.hour
             minute = time_captured.minute
             second = time_captured.second
@@ -199,7 +199,7 @@ class MyNetwork(nn.Module):
         for i in batched_inputs:
             time_captured = i["date_captured"]
             time_captured = datetime.fromtimestamp(time_captured / 1e9)
-            time_captured = time_captured.astimezone(datetime.tzinfo.utoffset(-8))
+            time_captured = time_captured.astimezone(tzinfo.utoffset(-8))
             hour = time_captured.hour
             minute = time_captured.minute
             second = time_captured.second
