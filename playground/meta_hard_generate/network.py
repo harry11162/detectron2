@@ -149,7 +149,8 @@ class MyNetwork(nn.Module):
             metas.append(meta)
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
-        features = self.backbone(images.tensor, metas)
+        features = self.backbone.bottom_up(images.tensor, metas)  # the real backbone
+        features = self.backbone(features)  # FPN
 
         if self.proposal_generator is not None:
             proposals, proposal_losses = self.proposal_generator(images, features, gt_instances)
@@ -208,7 +209,8 @@ class MyNetwork(nn.Module):
             metas.append(meta)
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
-        features = self.backbone(images.tensor, metas)
+        features = self.backbone.bottom_up(images.tensor, metas)  # the real backbone
+        features = self.backbone(features)  # FPN
 
         if detected_instances is None:
             if self.proposal_generator is not None:
