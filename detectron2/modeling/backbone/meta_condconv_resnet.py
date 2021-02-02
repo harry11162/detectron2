@@ -552,7 +552,7 @@ class ResNet(Backbone):
                 if isinstance(block, CondConvBottleneckBlock):
                     x = block(x, meta)
                 else:
-                    x = stage(x)
+                    x = block(x)
             if name in self._out_features:
                 outputs[name] = x
         if self.num_classes is not None:
