@@ -14,7 +14,7 @@ from detectron2.utils.logger import log_first_n
 
 from detectron2.layers import ShapeSpec
 
-from detectron2.modeling.backbone.meta_condconv_resnet import build_cond_conv_resnet_backbone
+from detectron2.modeling.backbone.meta_condconv_resnet import build_meta_cond_conv_resnet_backbone
 from detectron2.modeling.backbone import Backbone, build_backbone
 from detectron2.modeling.postprocessing import detector_postprocess
 from detectron2.modeling.proposal_generator import build_proposal_generator
@@ -48,7 +48,7 @@ class GeneralizedRCNN(nn.Module):
             vis_period: the period to run visualization. Set to 0 to disable.
         """
         super().__init__()
-        self.backbone = build_cond_conv_resnet_backbone(cfg, ShapeSpec(channels=3))
+        self.backbone = build_meta_cond_conv_resnet_backbone(cfg, ShapeSpec(channels=3))
         self.proposal_generator = build_proposal_generator(cfg, self.backbone.output_shape()),
         self.roi_heads = build_roi_heads(cfg, self.backbone.output_shape()),
 
@@ -192,7 +192,7 @@ class GeneralizedRCNN(nn.Module):
         assert not self.training
 
         images = self.preprocess_image(batched_inputs)
-        
+
         metas = []
         for i in batched_inputs:
             time_captured = i["date_captured"]
