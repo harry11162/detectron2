@@ -201,6 +201,8 @@ def setup(args):
     register_coco_instances("domain_train", {}, "domain/train_annotations.json", "domain")
     register_coco_instances("domain_test", {}, "domain/test_annotations.json", "domain")
     cfg = get_cfg()
+    assert args.config_file == "", f"This code automatically uses the config file in this directory"
+    args.config_file = "configs.yaml"
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     cfg.freeze()
