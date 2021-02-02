@@ -13,3 +13,4 @@ SOLVER:
 DATASETS:
   TRAIN: ("domain_train",)
   TEST: ("domain_test",)
+OUTPUT_DIR: "logs"
