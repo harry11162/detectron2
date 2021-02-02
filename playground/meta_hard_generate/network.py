@@ -59,8 +59,8 @@ class MyNetwork(nn.Module):
         if self.vis_period > 0:
             assert self.input_format is not None, "input_format is required for visualization!"
 
-        self.register_buffer("pixel_mean", torch.Tensor(pixel_mean).view(-1, 1, 1))
-        self.register_buffer("pixel_std", torch.Tensor(pixel_std).view(-1, 1, 1))
+        self.register_buffer("pixel_mean", torch.Tensor(cfg.MODEL.PIXEL_MEAN).view(-1, 1, 1))
+        self.register_buffer("pixel_std", torch.Tensor(cfg.MODEL.PIXEL_STD).view(-1, 1, 1))
         assert (
             self.pixel_mean.shape == self.pixel_std.shape
         ), f"{self.pixel_mean} and {self.pixel_std} have different shapes!"
