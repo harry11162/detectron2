@@ -167,7 +167,7 @@ class MyNetwork(nn.Module):
             correlation_loss = None
         else:
             # compute correlation loss
-            B, C = routing_weights.size()[0]
+            B, C = routing_weights.size()
             M = self.weight_memory_bank.size()[0]
             # metas (B, 1)
             # self.time_memory_bank (M, 1)
