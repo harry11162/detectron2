@@ -1,6 +1,6 @@
 _BASE_: "../../configs/Base-RCNN-FPN.yaml"
 MODEL:
-  WEIGHTS: "../../pretrain_models/R-50-condconv-8.pkl"
+  WEIGHTS: "../../pretrain_models/R-50-condconv-16.pkl"
   MASK_ON: False
   RESNETS:
     DEPTH: 50
