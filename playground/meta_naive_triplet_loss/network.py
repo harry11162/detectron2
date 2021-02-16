@@ -166,7 +166,7 @@ class MyNetwork(nn.Module):
         time_distance = torch.stack([d1, d2, d3, d4], dim=0).min(dim=0).values
 
         # prevent selecting itself as positive/negative sample
-        diag = torch.ones((B,), dtype=time_distance.dtype, device=time_distance.dtype) * 100
+        diag = time_distance.new_ones((B,)) * 100
         diag = torch.diag(diag)
         min_idxs = (time_distance + diag).argmin(dim=1)
         max_idxs = (time_distance - diag).argmax(dim=1)  # (B,)
