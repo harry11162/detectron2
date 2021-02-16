@@ -169,6 +169,7 @@ class MyNetwork(nn.Module):
         min_idxs = (time_distance + diag).argmin(dim=1)
         max_idxs = (time_distance - diag).argmax(dim=1)  # (B,)
 
+        routing_weights = F.normalize(routing_weights, dim=1)  # L2 normlize
         positive = routing_weights[min_idxs]
         negative = routing_weights[max_idxs]
         triplet_loss = {"triplet_loss": F.triplet_margin_loss(routing_weights, positive, negative)}
