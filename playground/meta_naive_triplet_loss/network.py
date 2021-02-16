@@ -163,7 +163,7 @@ class MyNetwork(nn.Module):
         d2 = (metas - metas.reshape(1, B) + 1.) ** 2  # (B, B)
         d3 = (metas.reshape(1, B) - metas) ** 2  # (B, B)
         d4 = (metas.reshape(1, B) - metas + 1.) ** 2  # (B, B)
-        time_distance = torch.stack([d1, d2, d3, d4], dim=0).min(dim=0)
+        time_distance = torch.stack([d1, d2, d3, d4], dim=0).min(dim=0).values
 
         # prevent selecting itself as positive/negative sample
         diag = torch.ones(B, dtype=time_distance.dtype, device=time_distance.dtype) * 100
