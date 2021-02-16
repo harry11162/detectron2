@@ -149,8 +149,6 @@ class MyNetwork(nn.Module):
             meta = (((second / 60 + minute) / 60) + hour) / 24
             metas.append([meta])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
-        import pdb
-        pdb.set_trace()
 
         features = self.backbone.bottom_up(images.tensor)  # the real backbone
         routing_weights = features["routing_weights"]
