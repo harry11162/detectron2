@@ -566,6 +566,8 @@ _C.SOLVER.CLIP_GRADIENTS.CLIP_VALUE = 1.0
 # gradient clipping type; for L-inf, please specify .inf
 _C.SOLVER.CLIP_GRADIENTS.NORM_TYPE = 2.0
 
+_C.SOLVER.TRIPLET_LOSS_WEIGHT = 1.0
+
 # Enable automatic mixed precision for training
 # Note that this does not change model's inference behavior.
 # To use AMP in inference, run inference under autocast()
