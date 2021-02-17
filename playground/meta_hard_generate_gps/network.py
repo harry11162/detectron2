@@ -209,8 +209,12 @@ class MyNetwork(nn.Module):
             hour = time_captured.hour
             minute = time_captured.minute
             second = time_captured.second
-            meta = (((second / 60 + minute) / 60) + hour) / 24
-            metas.append([meta])
+            time_captured = (((second / 60 + minute) / 60) + hour) / 24
+            
+            altitude = i["altitude"]
+            latitude = i["latitude"]
+            longtitude = i["longtitude"]
+            metas.append([time_captured, altitude, latitude, longtitude])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
         features = self.backbone.bottom_up(images.tensor, metas)  # the real backbone
