@@ -60,16 +60,16 @@ class MyNetwork(nn.Module):
         if self.vis_period > 0:
             assert self.input_format is not None, "input_format is required for visualization!"
 
-        D = cfg.MODEL.RESNETS.HARD_GENERATE.IN_CHANNELS // 4
-        ws = torch.tensor(range(1, D // 2 + 1), dtype=self.pixel_mean.dtype, device=self.pixel_mean.device)
-        ws = 1 / (10000 ** (ws * 2 / D))
-        self.ws = ws
-
         self.register_buffer("pixel_mean", torch.Tensor(cfg.MODEL.PIXEL_MEAN).view(-1, 1, 1))
         self.register_buffer("pixel_std", torch.Tensor(cfg.MODEL.PIXEL_STD).view(-1, 1, 1))
         assert (
             self.pixel_mean.shape == self.pixel_std.shape
         ), f"{self.pixel_mean} and {self.pixel_std} have different shapes!"
+
+        D = cfg.MODEL.RESNETS.HARD_GENERATE.IN_CHANNELS // 4
+        ws = torch.tensor(range(1, D // 2 + 1), dtype=self.pixel_mean.dtype, device=self.pixel_mean.device)
+        ws = 1 / (10000 ** (ws * 2 / D))
+        self.ws = ws
 
     @property
     def device(self):
