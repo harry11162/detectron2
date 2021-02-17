@@ -164,8 +164,8 @@ Category ids in annotations are not in [1, #categories]! We'll apply a mapping f
             record["altitude"] = img_dict["altitude"]
         if "latitude" in img_dict:
             record["latitude"] = img_dict["latitude"]
-        if "longtitude" in img_dict:
-            record["longtitude"] = img_dict["longtitude"]
+        if "longitude" in img_dict:
+            record["longitude"] = img_dict["longitude"]
 
         objs = []
         for anno in anno_dict_list:
