@@ -215,6 +215,9 @@ class MyNetwork(nn.Module):
             metas.append([meta])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
+        import pdb
+        pdb.set_trace()
+
         wt = self.ws[None, :] * metas  # (N, 32)
         sinwt = torch.sin(wt)
         coswt = torch.cos(wt)
