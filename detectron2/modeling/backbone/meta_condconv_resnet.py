@@ -709,6 +709,8 @@ def build_meta_cond_conv_resnet_backbone(cfg, input_shape):
     cond_conv_on_per_stage = cfg.MODEL.RESNETS.COND_CONV_ON_PER_STAGE
     cond_conv_num_experts = cfg.MODEL.RESNETS.COND_CONV_NUM_EXPERTS
     cond_conv_dropout_rate = cfg.MODEL.RESNETS.COND_CONV_DROPOUT_RATE
+    meta_channels = cfg.MODEL.RESNETS.HARD_GENERATE.IN_CHANNELS
+    routing_inner_channels = cfg.MODEL.RESNETS.HARD_GENERATE.INNER_CHANNELS
     # fmt: on
     assert res5_dilation in {1, 2}, "res5_dilation cannot be {}.".format(res5_dilation)
 
@@ -762,6 +764,8 @@ def build_meta_cond_conv_resnet_backbone(cfg, input_shape):
                 stage_kargs["block_class"] = CondConvBottleneckBlock
                 stage_kargs["cond_conv_num_experts"] = cond_conv_num_experts
                 stage_kargs["cond_conv_dropout_rate"] = cond_conv_dropout_rate
+                stage_kargs["meta_channels"] = meta_channels
+                stage_kargs["routing_inner_channels"] = routing_inner_channels
             else:
                 stage_kargs["block_class"] = BottleneckBlock
         blocks = ResNet.make_stage(**stage_kargs)
