@@ -160,6 +160,12 @@ Category ids in annotations are not in [1, #categories]! We'll apply a mapping f
         # add my custom metadata
         if "date_captured" in img_dict:
             record["date_captured"] = img_dict["date_captured"]
+        if "altitude" in img_dict:
+            record["altitude"] = img_dict["altitude"]
+        if "latitude" in img_dict:
+            record["latitude"] = img_dict["latitude"]
+        if "longtitude" in img_dict:
+            record["longtitude"] = img_dict["longtitude"]
 
         objs = []
         for anno in anno_dict_list:
