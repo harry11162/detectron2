@@ -66,6 +66,9 @@ class MyNetwork(nn.Module):
             self.pixel_mean.shape == self.pixel_std.shape
         ), f"{self.pixel_mean} and {self.pixel_std} have different shapes!"
 
+        import pdb
+        pdb.set_trace()
+
         D = cfg.MODEL.RESNETS.HARD_GENERATE.IN_CHANNELS
         ws = torch.tensor(range(1, D // 2 + 1), dtype=self.pixel_mean.dtype, device=self.pixel_mean.device)
         ws = 1 / (10000 ** (ws * 2 / D))
