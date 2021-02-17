@@ -66,9 +66,6 @@ class MyNetwork(nn.Module):
             self.pixel_mean.shape == self.pixel_std.shape
         ), f"{self.pixel_mean} and {self.pixel_std} have different shapes!"
 
-        import pdb
-        pdb.set_trace()
-
         D = cfg.MODEL.RESNETS.HARD_GENERATE.IN_CHANNELS
         ws = torch.tensor(range(1, D // 2 + 1), dtype=self.pixel_mean.dtype, device=self.pixel_mean.device)
         ws = 1 / (10000 ** (ws * 2 / D))
@@ -158,7 +155,12 @@ class MyNetwork(nn.Module):
             metas.append([meta])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
-        features = self.backbone.bottom_up(images.tensor, metas)  # the real backbone
+        wt = self.ws[None, :] * metas  # (N, 32)
+        sinwt = torch.sin(wt)
+        coswt = torch.cos(wt)
+        encoding = torch.cat([sinwt, coswt], dim=1)
+
+        features = self.backbone.bottom_up(images.tensor, encoding)  # the real backbone
         features = self.backbone(None, features=features)  # FPN
 
         if self.proposal_generator is not None:
@@ -217,9 +219,6 @@ class MyNetwork(nn.Module):
             meta = (((second / 60 + minute) / 60) + hour) / 24
             metas.append([meta])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
-
-        import pdb
-        pdb.set_trace()
 
         wt = self.ws[None, :] * metas  # (N, 32)
         sinwt = torch.sin(wt)
