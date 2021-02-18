@@ -156,8 +156,8 @@ class MyNetwork(nn.Module):
             
             altitude = i["altitude"] / 100
             latitude = i["latitude"] / 100
-            longtitude = i["longtitude"] / 100
-            metas.append([time_captured, altitude, latitude, longtitude])
+            longitude = i["longitude"] / 100
+            metas.append([time_captured, altitude, latitude, longitude])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
         features = self.backbone.bottom_up(images.tensor)  # the real backbone
