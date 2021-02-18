@@ -213,7 +213,7 @@ class MyNetwork(nn.Module):
             
             altitude = i["altitude"]
             latitude = i["latitude"]
-            longtitude = i["longitude"]
+            longitude = i["longitude"]
             metas.append([time_captured, altitude, latitude, longitude])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
