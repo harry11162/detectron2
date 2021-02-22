@@ -154,9 +154,9 @@ class MyNetwork(nn.Module):
             second = time_captured.second
             time_captured = (((second / 60 + minute) / 60) + hour) / 24
             
-            altitude = i["altitude"] / 100
-            latitude = i["latitude"] / 100
-            longitude = i["longitude"] / 100
+            altitude = i["altitude"] / 1000
+            latitude = i["latitude"] / 1000
+            longitude = i["longitude"] / 1000
             metas.append([time_captured, altitude, latitude, longitude])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
