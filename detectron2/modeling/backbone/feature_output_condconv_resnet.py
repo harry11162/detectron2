@@ -671,7 +671,7 @@ def make_stage(*args, **kwargs):
 
 
 @BACKBONE_REGISTRY.register()
-def build_weight_output_cond_conv_resnet_backbone(cfg, input_shape):
+def build_feature_output_cond_conv_resnet_backbone(cfg, input_shape):
     """
     Create a ResNet instance from config.
 

@@ -16,7 +16,7 @@ from detectron2.utils.logger import log_first_n
 
 from detectron2.layers import ShapeSpec
 
-from detectron2.modeling.backbone.weight_output_condconv_resnet import build_weight_output_cond_conv_resnet_backbone
+from detectron2.modeling.backbone.feature_output_condconv_resnet import build_feature_output_cond_conv_resnet_backbone
 from detectron2.modeling.backbone import Backbone, build_backbone
 from detectron2.modeling.backbone.fpn import build_custom_backbone_fpn
 from detectron2.modeling.postprocessing import detector_postprocess
@@ -51,7 +51,7 @@ class MyNetwork(nn.Module):
             vis_period: the period to run visualization. Set to 0 to disable.
         """
         super().__init__()
-        backbone = build_weight_output_cond_conv_resnet_backbone(cfg, ShapeSpec(channels=3))
+        backbone = build_feature_output_cond_conv_resnet_backbone(cfg, ShapeSpec(channels=3))
         self.backbone = build_custom_backbone_fpn(cfg, backbone)
         self.proposal_generator = build_proposal_generator(cfg, self.backbone.output_shape())
         self.roi_heads = build_roi_heads(cfg, self.backbone.output_shape())
