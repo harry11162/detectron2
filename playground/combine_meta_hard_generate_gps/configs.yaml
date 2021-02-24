@@ -1,0 +1,18 @@
+_BASE_: "../../configs/Base-RCNN-FPN.yaml"
+MODEL:
+  WEIGHTS: "../../pretrain_models/R-50-condconv-8.pkl"
+  MASK_ON: False
+  RESNETS:
+    DEPTH: 50
+    COND_CONV_ON_PER_STAGE: [False, False, False, True]
+    COND_CONV_NUM_EXPERTS: 8
+    COND_CONV_DROPOUT_RATE: 0.
+    HARD_GENERATE:
+      IN_CHANNELS: 4
+SOLVER:
+  IMS_PER_BATCH: 8
+  BASE_LR: 0.01
+DATASETS:
+  TRAIN: ("domain_train",)
+  TEST: ("domain_test",)
+OUTPUT_DIR: "logs"
