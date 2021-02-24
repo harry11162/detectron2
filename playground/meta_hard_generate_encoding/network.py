@@ -220,7 +220,7 @@ class MyNetwork(nn.Module):
             metas.append([meta])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
-        wt = self.ws[None, :] * metas  # (N, 32)
+        wt = self.ws[None, :].to(images.tensor.device) * metas  # (N, 32)
         sinwt = torch.sin(wt)
         coswt = torch.cos(wt)
         encoding = torch.cat([sinwt, coswt], dim=1)
