@@ -428,7 +428,7 @@ class CondConvBottleneckBlock(CNNBlockBase):
 
         out += shortcut
         out = F.relu_(out)
-        return out, F.avg_pool2d(out)
+        return out, F.adaptive_avg_pool2d(out, output_size=1).squeeze(-1).squeeze(-1)
 
 
 class BasicStem(CNNBlockBase):
