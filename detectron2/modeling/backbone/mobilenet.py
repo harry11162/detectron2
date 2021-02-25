@@ -1,5 +1,4 @@
 from torch import nn
-from torchvision.utils import load_state_dict_from_url
 
 from .backbone import Backbone
 from .build import BACKBONE_REGISTRY
