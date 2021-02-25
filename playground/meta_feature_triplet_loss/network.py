@@ -224,7 +224,6 @@ class MyNetwork(nn.Module):
         images = self.preprocess_image(batched_inputs)
 
         features = self.backbone.bottom_up(images.tensor)  # the real backbone
-        routing_weights = features["routing_weights"]
         features = self.backbone(None, features=features)  # FPN
 
         if detected_instances is None:
