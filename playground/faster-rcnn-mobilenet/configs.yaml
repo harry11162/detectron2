@@ -1,0 +1,15 @@
+_BASE_: "../../configs/Base-RCNN-FPN.yaml"
+MODEL:
+  WEIGHTS: "../../pretrain_models/mobilenet_v2-b0353104.pth"
+  MASK_ON: False
+  RESNETS:
+    OUT_FEATURES: ["c2", "c3", "c4", "c5"]
+  FPN:
+    IN_FEATURES: ["c2", "c3", "c4", "c5"]
+SOLVER:
+  IMS_PER_BATCH: 8
+  BASE_LR: 0.01
+DATASETS:
+  TRAIN: ("domain_train",)
+  TEST: ("domain_test",)
+OUTPUT_DIR: "logs"

@@ -4,6 +4,8 @@ from torchvision.utils import load_state_dict_from_url
 from .backbone import Backbone
 from .build import BACKBONE_REGISTRY
 
+from detectron2.layers import ShapeSpec
+from detectron2.layers.batch_norm import FrozenBatchNorm2d
 
 __all__ = ['MobileNetV2', 'mobilenet_v2']
 
@@ -38,7 +40,7 @@ class ConvBNReLU(nn.Sequential):
         padding = (kernel_size - 1) // 2
         super(ConvBNReLU, self).__init__(
             nn.Conv2d(in_planes, out_planes, kernel_size, stride, padding, groups=groups, bias=False),
-            nn.BatchNorm2d(out_planes),
+            FrozenBatchNorm2d(out_planes),
             nn.ReLU6(inplace=True)
         )
 
@@ -61,7 +63,7 @@ class InvertedResidual(nn.Module):
             ConvBNReLU(hidden_dim, hidden_dim, stride=stride, groups=hidden_dim),
             # pw-linear
             nn.Conv2d(hidden_dim, oup, 1, 1, 0, bias=False),
-            nn.BatchNorm2d(oup),
+            FrozenBatchNorm2d(oup),
         ])
         self.conv = nn.Sequential(*layers)
 
@@ -176,20 +178,14 @@ class MobileNetV2(Backbone):
         return outputs
 
     def output_shape(self):
+        return {
+            "c2": ShapeSpec(channels=24, stride=4),
+            "c3": ShapeSpec(channels=32, stride=8),
+            "c4": ShapeSpec(channels=96, stride=16),
+            "c5": ShapeSpec(channels=320, stride=32),
+        }
 
 
-def mobilenet_v2(pretrained=False, progress=True, **kwargs):
-    """
-    Constructs a MobileNetV2 architecture from
-    `"MobileNetV2: Inverted Residuals and Linear Bottlenecks" <https://arxiv.org/abs/1801.04381>`_.
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-        progress (bool): If True, displays a progress bar of the download to stderr
-    """
-    model = MobileNetV2(**kwargs)
-    if pretrained:
-        state_dict = load_state_dict_from_url(model_urls['mobilenet_v2'],
-                                              progress=progress)
-        model.load_state_dict(state_dict)
-    return model
+@BACKBONE_REGISTRY.register()
+def build_mobilenetv2_backbone(cfg):
+    return MobileNetV2()
