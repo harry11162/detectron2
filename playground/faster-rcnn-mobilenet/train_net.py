@@ -47,7 +47,6 @@ from detectron2.evaluation import (
     inference_on_dataset,
     print_csv_format,
 )
-from detectron2.modeling import build_model
 from detectron2.solver import build_lr_scheduler, build_optimizer
 from detectron2.utils.events import (
     CommonMetricPrinter,
@@ -55,6 +54,8 @@ from detectron2.utils.events import (
     JSONWriter,
     TensorboardXWriter,
 )
+
+from network import MyNetwork
 
 logger = logging.getLogger("detectron2")
 
@@ -211,7 +212,7 @@ def setup(args):
 def main(args):
     cfg = setup(args)
 
-    model = build_model(cfg)
+    model = MyNetwork(cfg)
     model.to(torch.device(cfg.MODEL.DEVICE))
     logger.info("Model:\n{}".format(model))
     if args.eval_only:
