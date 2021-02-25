@@ -129,7 +129,7 @@ def do_train(cfg, model, resume=False):
     scheduler = build_lr_scheduler(cfg, optimizer)
 
     checkpointer = DetectionCheckpointer(
-        model, cfg.OUTPUT_DIR, optimizer=optimizer, scheduler=scheduler
+        model.backbone.bottom_up, cfg.OUTPUT_DIR, optimizer=optimizer, scheduler=scheduler
     )
     start_iter = (
         checkpointer.resume_or_load(cfg.MODEL.WEIGHTS, resume=resume).get("iteration", -1) + 1
@@ -216,7 +216,7 @@ def main(args):
     model.to(torch.device(cfg.MODEL.DEVICE))
     logger.info("Model:\n{}".format(model))
     if args.eval_only:
-        DetectionCheckpointer(model.backbone.bottom_up, save_dir=cfg.OUTPUT_DIR).resume_or_load(
+        DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
             cfg.MODEL.WEIGHTS, resume=args.resume
         )
         return do_test(cfg, model)
