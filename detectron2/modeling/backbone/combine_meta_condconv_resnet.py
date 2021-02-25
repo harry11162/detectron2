@@ -420,7 +420,7 @@ class CondConvBottleneckBlock(CNNBlockBase):
                 weight_init.c2_msra_fill(layer)
 
     def forward(self, x, meta):
-        routing_weight = self.original_route_func(x) + self.meta_route_func(meta)
+        routing_weight = self.original_route_func(x) * self.meta_route_func(meta)
 
         out = self.conv1(x, routing_weight)
         out = F.relu_(out)
