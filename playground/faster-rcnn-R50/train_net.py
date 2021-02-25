@@ -212,6 +212,8 @@ def main(args):
     cfg = setup(args)
 
     model = build_model(cfg)
+    import pdb
+    pdb.set_trace()
     model.to(torch.device(cfg.MODEL.DEVICE))
     logger.info("Model:\n{}".format(model))
     if args.eval_only:
