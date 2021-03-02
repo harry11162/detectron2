@@ -151,9 +151,9 @@ class MyNetwork(nn.Module):
             month = time_captured.month
             time_in_year = ((day / 30) + month) / 12
             
-            altitude = i["altitude"]
-            latitude = i["latitude"]
-            longitude = i["longitude"]
+            altitude = i["altitude"] / 100
+            latitude = i["latitude"] / 100
+            longitude = i["longitude"] / 100
             metas.append([time_in_day, time_in_year, altitude, latitude, longitude])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
