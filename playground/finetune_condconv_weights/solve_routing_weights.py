@@ -65,6 +65,7 @@ logger = logging.getLogger("detectron2")
 # seems it has to be a nn.Module to use torch optimizers
 class RoutingWeightModel(nn.Module):
     def __init__(self, a, b):
+        super(RoutingWeightModel, self).__init__()
         self.routing_weights = nn.Parameter(torch.zeros(a, b))
 
 
