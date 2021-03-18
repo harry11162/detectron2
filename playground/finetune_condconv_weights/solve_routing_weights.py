@@ -163,18 +163,14 @@ def do_train(cfg, model, resume=False):
             losses = sum(loss_dict.values())
             assert torch.isfinite(losses).all(), loss_dict
 
-            loss_dict_reduced = {k: v.item() for k, v in comm.reduce_dict(loss_dict).items()}
-            losses_reduced = sum(loss for loss in loss_dict_reduced.values())
-            if comm.is_main_process():
-                storage.put_scalars(total_loss=losses_reduced, **loss_dict_reduced)
-
             optimizer.zero_grad()
             losses.backward()
             optimizer.step()
             print(iteration, losses.item())
     
-    torch.save(routing_weights+0, "optimal_routing_weights.pth")
-    return routing_weights+0
+    routing_weights = routing_weights_model.routing_weights+0
+    torch.save(routing_weights, "optimal_routing_weights.pth")
+    return routing_weights
 
 
 def setup(args):
