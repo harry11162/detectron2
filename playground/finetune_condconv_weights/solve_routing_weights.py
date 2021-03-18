@@ -152,7 +152,7 @@ def do_train(cfg, model, resume=False):
 
     logger.info("Starting solving optimized routing weights")
 
-    with EventStorage(0) as storage:
+    with EventStorage(start_iter=0) as storage:
         for data, iteration in zip(data_loader, range(num_images)):
             storage.iter = iteration
             for _ in range(10):
@@ -165,7 +165,6 @@ def do_train(cfg, model, resume=False):
                 data[0]["routing_weights"] = w_list
                 loss_dict = model(data)
                 losses = sum(loss_dict.values())
-                print(type(loss_dict), loss_dict, type(losses), losses)
                 assert torch.isfinite(losses).all(), loss_dict
 
                 loss_dict_reduced = {k: v.item() for k, v in comm.reduce_dict(loss_dict).items()}
@@ -176,7 +175,6 @@ def do_train(cfg, model, resume=False):
                 optimizer.zero_grad()
                 losses.backward()
                 optimizer.step()
-                print(iteration, losses.item())
     
     routing_weights = routing_weights_model.routing_weights+0
     torch.save(routing_weights, "optimal_routing_weights.pth")
