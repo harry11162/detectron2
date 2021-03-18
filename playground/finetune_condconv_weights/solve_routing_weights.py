@@ -144,6 +144,8 @@ def do_train(cfg, model, resume=False):
             print("found")
             assert False, "found"
             params = params + list(m.parameters())
+    print(params)
+    return 0
     optimizer = torch.optim.SGD(params, lr=cfg.SOLVER.BASE_LR,
                                 momentum=cfg.SOLVER.MOMENTUM, weight_decay=0)
 
