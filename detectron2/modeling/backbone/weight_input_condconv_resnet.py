@@ -422,7 +422,7 @@ class CondConvBottleneckBlock(CNNBlockBase):
 
         out += shortcut
         out = F.relu_(out)
-        return out, routing_weight
+        return out
 
 
 class BasicStem(CNNBlockBase):
