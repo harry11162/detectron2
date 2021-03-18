@@ -152,7 +152,7 @@ def do_train(cfg, model, resume=False):
 
     logger.info("Starting solving optimized routing weights")
 
-    with EventStorage(start_iter) as storage:
+    with EventStorage(0) as storage:
         for data, iteration in zip(data_loader, range(num_images)):
             storage.iter = iteration
             for _ in range(10):
