@@ -131,7 +131,7 @@ def do_train(cfg, model, resume=False):
     model_weights = torch.load(cfg.MODEL.WEIGHTS)
     if "model" in model_weights:
         model_weights = model_weights["model"]
-    model.load_state_dict(model.backbone.bottom_up, strict=False)  # should better set True for once to see if it's loaded right
+    model.load_state_dict(model_weights, strict=False)  # should better set True for once to see if it's loaded right
 
     assert cfg.SOLVER.IMS_PER_BATCH == 1, f"should set batchsize=1"
     sampler = torch.utils.data.sampler.SequentialSampler(range(1725))
