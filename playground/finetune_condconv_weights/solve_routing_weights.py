@@ -155,7 +155,7 @@ def do_train(cfg, model, resume=False):
         for _ in range(10):
             w = routing_weights_model.routing_weights[iteration]
             w_list = [
-                torch.sigmoid(w[:8])[None, :]],
+                torch.sigmoid(w[:8])[None, :],
                 torch.sigmoid(w[8:16])[None, :],
                 torch.sigmoid(w[16:])[None, :],
             ]
