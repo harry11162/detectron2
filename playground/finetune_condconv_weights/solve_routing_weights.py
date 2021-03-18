@@ -143,7 +143,7 @@ def do_train(cfg, model, resume=False):
     assert cfg.SOLVER.IMS_PER_BATCH == 1, f"should set batchsize=1"
     sampler = torch.utils.data.sampler.SequentialSampler(1725)
     data_loader = build_detection_train_loader(cfg, sampler=sampler, aspect_ratio_grouping=False)
-    num_images = len(data_loader)
+    num_images = 1725
 
     routing_weights_model = RoutingWeightModel(num_images, 24)
     routing_weights_model = routing_weights_model.to(torch.device(cfg.MODEL.DEVICE))
