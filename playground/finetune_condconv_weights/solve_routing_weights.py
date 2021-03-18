@@ -156,7 +156,7 @@ def do_train(cfg, model, resume=False):
         for data, iteration in zip(data_loader, range(num_images)):
             storage.iter = iteration
             print(iteration)
-            for _ in range(20):
+            for _ in range(100):
                 w = routing_weights_model.routing_weights[iteration]
                 w_list = [
                     torch.sigmoid(w[:8])[None, :],
