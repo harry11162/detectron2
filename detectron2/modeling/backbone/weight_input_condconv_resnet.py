@@ -529,15 +529,14 @@ class ResNet(Backbone):
         """
         assert x.dim() == 4, f"ResNet takes an input of shape (N, C, H, W). Got {x.shape} instead!"
         outputs = {}
-        routing_weights = []
+        routing_weights = iter(routing_weights)
         x = self.stem(x)
         if "stem" in self._out_features:
             outputs["stem"] = x
         for name, stage in zip(self.stage_names, self.stages):
             for block in stage:
                 if isinstance(block, CondConvBottleneckBlock):
-                    print(name)
-                    x = block(x, routing_weights[name])
+                    x = block(x, next(routing_weights))
                 else:
                     x = block(x)
             if name in self._out_features:

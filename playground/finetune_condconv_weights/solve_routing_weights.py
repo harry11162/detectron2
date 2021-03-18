@@ -154,12 +154,12 @@ def do_train(cfg, model, resume=False):
     for data, iteration in zip(data_loader, range(num_images)):
         for _ in range(10):
             w = routing_weights_model.routing_weights[iteration]
-            w_dict = {
-                "a": torch.sigmoid(w[:8]),
-                "b": torch.sigmoid(w[8:16]),
-                "c": torch.sigmoid(w[16:]),
-            }
-            data[0]["routing_weights"] = w_dict
+            w_list = [
+                torch.sigmoid(w[:8]),
+                torch.sigmoid(w[8:16]),
+                torch.sigmoid(w[16:]),
+            ]
+            data[0]["routing_weights"] = w_list
             loss_dict = model(data)
             losses = sum(loss_dict.values())
             assert torch.isfinite(losses).all(), loss_dict
