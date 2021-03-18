@@ -1,0 +1,13 @@
+_BASE_: "../../configs/Base-RCNN-C4.yaml"
+MODEL:
+  WEIGHTS: "detectron2://ImageNetPretrained/MSRA/R-18.pkl"
+  MASK_ON: False
+  RESNETS:
+    DEPTH: 18
+SOLVER:
+  IMS_PER_BATCH: 8
+  BASE_LR: 0.01
+DATASETS:
+  TRAIN: ("domain_train",)
+  TEST: ("domain_test",)
+OUTPUT_DIR: "logs"
