@@ -137,7 +137,7 @@ def do_train(cfg, model, resume=False):
     model_weights = torch.load(cfg.MODEL.WEIGHTS)
     if "model" in model_weights:
         model_weights = model_weights["model"]
-    model.load_state_dict(model_weights, strict=True)
+    model.load_state_dict(model_weights, strict=False)  # should better set True for once to see if it's loaded right
 
     assert len(cfg.DATASETS.TRAIN) == 1, f"only support training on one dataset"
     assert cfg.SOLVER.IMS_PER_BATCH == 1, f"should set batchsize=1"
