@@ -34,6 +34,7 @@ from detectron2.data import (
     build_detection_test_loader,
     build_detection_train_loader,
 )
+from detectron2.data.common import DatasetFromList
 from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import default_argument_parser, default_setup, launch
 from detectron2.evaluation import (
@@ -139,9 +140,9 @@ def do_train(cfg, model, resume=False):
         model_weights = model_weights["model"]
     model.load_state_dict(model_weights, strict=False)  # should better set True for once to see if it's loaded right
 
-    assert len(cfg.DATASETS.TRAIN) == 1, f"only support training on one dataset"
     assert cfg.SOLVER.IMS_PER_BATCH == 1, f"should set batchsize=1"
-    data_loader = build_detection_test_loader(cfg, cfg.DATASETS.TRAIN[0])
+    sampler = torch.utils.data.sampler.SequentialSampler(1725)
+    data_loader = build_detection_train_loader(cfg, sampler=sampler)
     num_images = len(data_loader)
 
     routing_weights_model = RoutingWeightModel(num_images, 24)
