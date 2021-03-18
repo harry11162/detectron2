@@ -127,7 +127,10 @@ def do_test(cfg, model):
 
 def do_train(cfg, model, resume=False):
     model.eval()
-    model.load_state_dict(torch.load(cfg.MODEL.WEIGHTS), strict=True)
+    model_weights = torch.load(cfg.MODEL.WEIGHTS)
+    if "model" in model_weights:
+        model_weights = model_weights["model"]
+    model.load_state_dict(model_weights, strict=True)
 
     assert len(cfg.DATASETS.TRAIN) == 1, f"only support training on one dataset"
     assert cfg.SOLVER.IMS_PER_BATCH == 1, f"should set batchsize=1"
