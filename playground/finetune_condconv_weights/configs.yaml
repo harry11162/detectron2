@@ -11,6 +11,6 @@ SOLVER:
   IMS_PER_BATCH: 1
   BASE_LR: 0.01
 DATASETS:
-  TRAIN: ("domain_train",)
-  TEST: ("domain_test",)
+  TRAIN: ("routine_train",)
+  TEST: (,)
 OUTPUT_DIR: "logs"
