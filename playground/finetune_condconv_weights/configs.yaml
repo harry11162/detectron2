@@ -9,7 +9,7 @@ MODEL:
     COND_CONV_DROPOUT_RATE: 0.
 SOLVER:
   IMS_PER_BATCH: 1
-  BASE_LR: 0.001
+  BASE_LR: 0.0001
 DATASETS:
   TRAIN: ("routine_train",)
   TEST: ("routine_test",)
