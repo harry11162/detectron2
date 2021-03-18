@@ -153,7 +153,7 @@ def do_train(cfg, model, resume=False):
         for data, iteration in zip(data_loader, range(num_images)):
             storage.iter = iteration
             print(iteration)
-            for _ in range(20):
+            for _ in range(10):
                 loss_dict, routing_weights = model(data)
                 losses = sum(loss_dict.values())
                 assert torch.isfinite(losses).all(), loss_dict
