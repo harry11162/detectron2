@@ -136,7 +136,6 @@ class MyNetwork(nn.Module):
             gt_instances = [x["instances"].to(self.device) for x in batched_inputs]
         else:
             gt_instances = None
-        images.tensor.requires_grad = True
 
         features = self.backbone.bottom_up(images.tensor, batched_inputs[0]["routing_weights"])  # the real backbone
         features = self.backbone(None, features=features)  # FPN

@@ -62,6 +62,12 @@ from network import MyNetwork
 logger = logging.getLogger("detectron2")
 
 
+# seems it has to be a nn.Module to use torch optimizers
+class RoutingWeightModel(nn.Module):
+    def __init__(self, a, b):
+        self.routing_weights = nn.Parameter(torch.zeros(a, b))
+
+
 def get_evaluator(cfg, dataset_name, output_folder=None):
     """
     Create evaluator(s) for a given dataset.
@@ -137,19 +143,20 @@ def do_train(cfg, model, resume=False):
     data_loader = build_detection_test_loader(cfg, cfg.DATASETS.TRAIN[0])
     num_images = len(data_loader)
 
-    routing_weights = nn.Parameter(torch.zeros(num_images, 24))
-    routing_weights = routing_weights.to(torch.device(cfg.MODEL.DEVICE))
-    optimizer = torch.optim.SGD([routing_weights], lr=cfg.SOLVER.BASE_LR, momentum=cfg.SOLVER.MOMENTUM, weight_decay=cfg.SOLVER.WEIGHT_DECAY)
+    routing_weights_model = RoutingWeightModel(num_images, 24)
+    routing_weights_model = routing_weights_model.to(torch.device(cfg.MODEL.DEVICE))
+    optimizer = torch.optim.SGD(routing_weights_model.parameters(), lr=cfg.SOLVER.BASE_LR,
+                                momentum=cfg.SOLVER.MOMENTUM, weight_decay=cfg.SOLVER.WEIGHT_DECAY)
 
     logger.info("Starting solving optimized routing weights")
 
     for data, iteration in zip(data_loader, range(num_images)):
         for _ in range(10):
-            w = routing_weights[iteration]
+            w = routing_weights_model.routing_weights[iteration]
             w_dict = {
-                "a": w[:8],
-                "b": w[8:16],
-                "c": w[16:],
+                "a": torch.sigmoid(w[:8]),
+                "b": torch.sigmoid(w[8:16]),
+                "c": torch.sigmoid(w[16:]),
             }
             data[0]["routing_weights"] = w_dict
             loss_dict = model(data)
