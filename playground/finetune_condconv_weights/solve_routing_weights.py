@@ -133,7 +133,7 @@ def do_test(cfg, model):
 
 
 def do_train(cfg, model, resume=False):
-    model.eval()
+    model.train()
     model_weights = torch.load(cfg.MODEL.WEIGHTS)
     if "model" in model_weights:
         model_weights = model_weights["model"]
