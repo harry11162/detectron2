@@ -148,7 +148,7 @@ def do_train(cfg, model, resume=False):
     routing_weights_model = RoutingWeightModel(num_images, 24)
     routing_weights_model = routing_weights_model.to(torch.device(cfg.MODEL.DEVICE))
     optimizer = torch.optim.SGD(routing_weights_model.parameters(), lr=cfg.SOLVER.BASE_LR,
-                                momentum=cfg.SOLVER.MOMENTUM, weight_decay=cfg.SOLVER.WEIGHT_DECAY)
+                                momentum=cfg.SOLVER.MOMENTUM, weight_decay=0)
 
     logger.info("Starting solving optimized routing weights")
 
