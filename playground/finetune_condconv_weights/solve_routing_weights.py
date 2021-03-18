@@ -50,6 +50,7 @@ from detectron2.evaluation import (
     print_csv_format,
 )
 from detectron2.modeling import build_model
+from detectron2.layers import route_func
 from detectron2.solver import build_lr_scheduler, build_optimizer
 from detectron2.utils.events import (
     CommonMetricPrinter,
@@ -61,14 +62,6 @@ from detectron2.utils.events import (
 from network import MyNetwork
 
 logger = logging.getLogger("detectron2")
-
-
-# seems it has to be a nn.Module to use torch optimizers
-class RoutingWeightModel(nn.Module):
-    def __init__(self, a, b):
-        super(RoutingWeightModel, self).__init__()
-        self.routing_weights = nn.Parameter(torch.zeros(a, b))
-
 
 def get_evaluator(cfg, dataset_name, output_folder=None):
     """
@@ -138,33 +131,31 @@ def do_train(cfg, model, resume=False):
     model_weights = torch.load(cfg.MODEL.WEIGHTS)
     if "model" in model_weights:
         model_weights = model_weights["model"]
-    model.load_state_dict(model_weights, strict=False)  # should better set True for once to see if it's loaded right
+    model.load_state_dict(model.backbone.bottom_up, strict=False)  # should better set True for once to see if it's loaded right
 
     assert cfg.SOLVER.IMS_PER_BATCH == 1, f"should set batchsize=1"
     sampler = torch.utils.data.sampler.SequentialSampler(range(1725))
     data_loader = build_detection_train_loader(cfg, sampler=sampler, aspect_ratio_grouping=False)
     num_images = 1725
 
-    routing_weights_model = RoutingWeightModel(num_images, 24)
-    routing_weights_model = routing_weights_model.to(torch.device(cfg.MODEL.DEVICE))
-    optimizer = torch.optim.SGD(routing_weights_model.parameters(), lr=cfg.SOLVER.BASE_LR,
+    params = []
+    for m in model.modules():
+        if isinstance(m, route_func):
+            print("found")
+            assert False, "found"
+            params = params + list(m.parameters())
+    optimizer = torch.optim.SGD(params, lr=cfg.SOLVER.BASE_LR,
                                 momentum=cfg.SOLVER.MOMENTUM, weight_decay=0)
 
     logger.info("Starting solving optimized routing weights")
 
+    all_routing_weights = []
     with EventStorage(start_iter=0) as storage:
         for data, iteration in zip(data_loader, range(num_images)):
             storage.iter = iteration
             print(iteration)
-            for _ in range(100):
-                w = routing_weights_model.routing_weights[iteration]
-                w_list = [
-                    torch.sigmoid(w[:8])[None, :],
-                    torch.sigmoid(w[8:16])[None, :],
-                    torch.sigmoid(w[16:])[None, :],
-                ]
-                data[0]["routing_weights"] = w_list
-                loss_dict = model(data)
+            for _ in range(20):
+                loss_dict, routing_weights = model(data)
                 losses = sum(loss_dict.values())
                 assert torch.isfinite(losses).all(), loss_dict
 
@@ -177,8 +168,9 @@ def do_train(cfg, model, resume=False):
                 losses.backward()
                 optimizer.step()
                 print(losses.item())
+            all_routing_weights.append(routing_weights)
     
-    routing_weights = routing_weights_model.routing_weights+0
+    routing_weights = torch.stack(all_routing_weights).cpu()
     torch.save(routing_weights, "optimal_routing_weights.pth")
     return routing_weights
 
