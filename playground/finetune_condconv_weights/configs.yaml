@@ -12,5 +12,5 @@ SOLVER:
   BASE_LR: 0.01
 DATASETS:
   TRAIN: ("routine_train",)
-  TEST: (,)
+  TEST: ("routine_test",)
 OUTPUT_DIR: "logs"
