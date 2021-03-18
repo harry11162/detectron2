@@ -15,7 +15,7 @@ from detectron2.utils.logger import log_first_n
 
 from detectron2.layers import ShapeSpec
 
-from detectron2.modeling.backbone.combine_meta_condconv_resnet import build_combine_meta_cond_conv_resnet_backbone
+from detectron2.modeling.backbone.weight_output_condconv_resnet import build_weight_output_cond_conv_resnet_backbone
 from detectron2.modeling.backbone import Backbone, build_backbone
 from detectron2.modeling.backbone.fpn import build_custom_backbone_fpn
 from detectron2.modeling.postprocessing import detector_postprocess
@@ -137,27 +137,7 @@ class MyNetwork(nn.Module):
         else:
             gt_instances = None
 
-        metas = []
-        for i in batched_inputs:
-            time_captured = i["date_captured"]
-            time_captured = datetime.fromtimestamp(time_captured / 1e9)
-            time_captured = time_captured.astimezone(pytz.timezone("US/Pacific"))
-            hour = time_captured.hour
-            minute = time_captured.minute
-            second = time_captured.second
-            time_in_day = (((second / 60 + minute) / 60) + hour) / 24
-
-            day = time_captured.day
-            month = time_captured.month
-            time_in_year = ((day / 30) + month) / 12
-            
-            altitude = i["altitude"] / 100
-            latitude = i["latitude"] / 100
-            longitude = i["longitude"] / 100
-            metas.append([time_in_day, time_in_year, altitude, latitude, longitude])
-        metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
-
-        features = self.backbone.bottom_up(images.tensor, metas)  # the real backbone
+        features = self.backbone.bottom_up(images.tensor, batched_inputs[0]["routing_weights"])  # the real backbone
         features = self.backbone(None, features=features)  # FPN
 
         if self.proposal_generator is not None:
@@ -205,27 +185,7 @@ class MyNetwork(nn.Module):
 
         images = self.preprocess_image(batched_inputs)
 
-        metas = []
-        for i in batched_inputs:
-            time_captured = i["date_captured"]
-            time_captured = datetime.fromtimestamp(time_captured / 1e9)
-            time_captured = time_captured.astimezone(pytz.timezone("US/Pacific"))
-            hour = time_captured.hour
-            minute = time_captured.minute
-            second = time_captured.second
-            time_in_day = (((second / 60 + minute) / 60) + hour) / 24
-
-            day = time_captured.day
-            month = time_captured.month
-            time_in_year = ((day / 30) + month) / 12
-            
-            altitude = i["altitude"] / 100
-            latitude = i["latitude"] / 100
-            longitude = i["longitude"] / 100
-            metas.append([time_in_day, time_in_year, altitude, latitude, longitude])
-        metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
-
-        features = self.backbone.bottom_up(images.tensor, metas)  # the real backbone
+        features = self.backbone.bottom_up(images.tensor, batched_inputs[0]["routing_weights"])  # the real backbone
         features = self.backbone(None, features=features)  # FPN
 
         if detected_instances is None:
