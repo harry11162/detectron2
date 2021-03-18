@@ -155,6 +155,7 @@ def do_train(cfg, model, resume=False):
     with EventStorage(start_iter=0) as storage:
         for data, iteration in zip(data_loader, range(num_images)):
             storage.iter = iteration
+            print(iteration)
             for _ in range(10):
                 w = routing_weights_model.routing_weights[iteration]
                 w_list = [
@@ -175,6 +176,7 @@ def do_train(cfg, model, resume=False):
                 optimizer.zero_grad()
                 losses.backward()
                 optimizer.step()
+                print(losses.item())
     
     routing_weights = routing_weights_model.routing_weights+0
     torch.save(routing_weights, "optimal_routing_weights.pth")

@@ -130,7 +130,6 @@ class MyNetwork(nn.Module):
         """
         if not self.training:
             return self.inference(batched_inputs)
-        print(batched_inputs[0]["date_captured"])
 
         images = self.preprocess_image(batched_inputs)
         if "instances" in batched_inputs[0]:
