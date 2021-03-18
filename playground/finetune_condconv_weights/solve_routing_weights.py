@@ -153,25 +153,25 @@ def do_train(cfg, model, resume=False):
         for data, iteration in zip(data_loader, range(num_images)):
             storage.iter = iteration
             print(iteration)
-            for _ in range(10):
+            for _ in range(1):
                 loss_dict, routing_weights = model(data)
-                losses = sum(loss_dict.values())
-                assert torch.isfinite(losses).all(), loss_dict
-
-                loss_dict_reduced = {k: v.item() for k, v in comm.reduce_dict(loss_dict).items()}
-                losses_reduced = sum(loss for loss in loss_dict_reduced.values())
-                if comm.is_main_process():
-                    storage.put_scalars(total_loss=losses_reduced, **loss_dict_reduced)
-
-                optimizer.zero_grad()
-                losses.backward()
-                optimizer.step()
-                print(losses.item())
+                # losses = sum(loss_dict.values())
+                # assert torch.isfinite(losses).all(), loss_dict
+# 
+                # loss_dict_reduced = {k: v.item() for k, v in comm.reduce_dict(loss_dict).items()}
+                # losses_reduced = sum(loss for loss in loss_dict_reduced.values())
+                # if comm.is_main_process():
+                #     storage.put_scalars(total_loss=losses_reduced, **loss_dict_reduced)
+# 
+                # optimizer.zero_grad()
+                # losses.backward()
+                # optimizer.step()
+                # print(losses.item())
             all_routing_weights.append(routing_weights)
             print(routing_weights.shape)
     
     routing_weights = torch.cat(all_routing_weights).cpu()
-    torch.save(routing_weights, "optimal_routing_weights.pth")
+    torch.save(routing_weights, "routing_weights.pth")
     return routing_weights
 
 
