@@ -168,6 +168,7 @@ def do_train(cfg, model, resume=False):
                 optimizer.step()
                 print(losses.item())
             all_routing_weights.append(routing_weights)
+            print(routing_weights.shape)
     
     routing_weights = torch.stack(all_routing_weights).cpu()
     torch.save(routing_weights, "optimal_routing_weights.pth")
