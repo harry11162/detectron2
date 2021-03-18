@@ -128,8 +128,9 @@ class MyNetwork(nn.Module):
                 The :class:`Instances` object has the following keys:
                 "pred_boxes", "pred_classes", "scores", "pred_masks", "pred_keypoints"
         """
-        if not self.training:
-            return self.inference(batched_inputs)
+        # we set self.eval(). but we still use forward().
+        # if not self.training:
+        #     return self.inference(batched_inputs)
 
         images = self.preprocess_image(batched_inputs)
         if "instances" in batched_inputs[0]:
