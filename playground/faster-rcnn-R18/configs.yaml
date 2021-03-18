@@ -1,6 +1,6 @@
 _BASE_: "../../configs/Base-RCNN-C4.yaml"
 MODEL:
-  WEIGHTS: "detectron2://ImageNetPretrained/MSRA/R-18.pkl"
+  WEIGHTS: "../../pretrain_models/resnet18-5c106cde.pth"
   MASK_ON: False
   RESNETS:
     DEPTH: 18
