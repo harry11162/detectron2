@@ -165,7 +165,7 @@ def do_train(cfg, model, resume=False):
 
                 optimizer.zero_grad()
                 losses.backward()
-                optimizer.step()
+                # optimizer.step()
                 print(losses.item())
             all_routing_weights.append(routing_weights)
             print(routing_weights.shape)
