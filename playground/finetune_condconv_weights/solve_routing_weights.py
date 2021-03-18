@@ -161,6 +161,7 @@ def do_train(cfg, model, resume=False):
             ]
             data[0]["routing_weights"] = w_list
             loss_dict = model(data)
+            print(loss_dict, type(loss_dict))
             losses = sum(loss_dict.values())
             assert torch.isfinite(losses).all(), loss_dict
 
