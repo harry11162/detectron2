@@ -3,7 +3,7 @@ MODEL:
   WEIGHTS: "../../pretrain_models/mobilenet_v2-b0353104.pth"
   MASK_ON: False
   RESNETS:
-    OUT_FEATURES: ["c2", "c3", "c4", "c5"]
+    OUT_FEATURES: ["res4"]
 SOLVER:
   IMS_PER_BATCH: 8
   BASE_LR: 0.01

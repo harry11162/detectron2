@@ -171,10 +171,10 @@ class MobileNetV2(Backbone):
 
     def output_shape(self):
         return {
-            "c2": ShapeSpec(channels=24, stride=4),
-            "c3": ShapeSpec(channels=32, stride=8),
-            "c4": ShapeSpec(channels=96, stride=16),
-            "c5": ShapeSpec(channels=320, stride=32),
+            "res2": ShapeSpec(channels=24, stride=4),
+            "res3": ShapeSpec(channels=32, stride=8),
+            "res4": ShapeSpec(channels=96, stride=16),
+            "res5": ShapeSpec(channels=320, stride=32),
         }
 
 
