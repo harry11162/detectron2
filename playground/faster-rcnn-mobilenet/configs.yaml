@@ -1,6 +1,6 @@
 _BASE_: "../../configs/Base-RCNN-C4.yaml"
 MODEL:
-  WEIGHTS: "../../pretrain_models/mobilenet_v2-b0353104.pth"
+  WEIGHTS: "../../pretrain_models/MobileNetV2.pth"
   MASK_ON: False
   RESNETS:
     OUT_FEATURES: ["res4"]
