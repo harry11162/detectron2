@@ -195,4 +195,4 @@ class MobileNetV2(Backbone):
 
 @BACKBONE_REGISTRY.register()
 def build_mobilenetv2_backbone(cfg):
-    return MobileNetV2()
+    return MobileNetV2(out_features=cfg.MODEL.RESNETS.OUT_FEATURES)
