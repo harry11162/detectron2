@@ -50,8 +50,7 @@ class MyNetwork(nn.Module):
             vis_period: the period to run visualization. Set to 0 to disable.
         """
         super().__init__()
-        backbone = build_mobilenetv2_backbone(cfg)
-        self.backbone = build_custom_backbone_fpn(cfg, backbone)
+        self.backbone = build_mobilenetv2_backbone(cfg)
         self.proposal_generator = build_proposal_generator(cfg, self.backbone.output_shape())
         self.roi_heads = build_roi_heads(cfg, self.backbone.output_shape())
 
@@ -143,8 +142,7 @@ class MyNetwork(nn.Module):
         else:
             gt_instances = None
 
-        features = self.backbone.bottom_up(images.tensor)  # the real backbone
-        features = self.backbone(None, features=features)  # FPN
+        features = self.backbone.(images.tensor)
 
         if self.proposal_generator is not None:
             proposals, proposal_losses = self.proposal_generator(images, features, gt_instances)
