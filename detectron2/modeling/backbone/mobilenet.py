@@ -166,6 +166,7 @@ class MobileNetV2(Backbone):
     def forward(self, x):
         assert x.dim() == 4, f"MobileNet takes an input of shape (N, C, H, W). Got {x.shape} instead!"
         outputs = {}
+        print(self.out_features)
         for i, layer in enumerate(self.features):
             x = layer(x)
             if i == 3:
@@ -183,6 +184,7 @@ class MobileNetV2(Backbone):
                 outputs[stage_name] = x
                 if stage_name == self.out_features[-1]:
                     break
+        print(outputs.keys())
         return outputs
 
     def output_shape(self):
