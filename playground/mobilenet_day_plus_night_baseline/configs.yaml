@@ -1,0 +1,14 @@
+_BASE_: "../../configs/Base-RCNN-C4.yaml"
+MODEL:
+  WEIGHTS: "../../pretrain_models/MobileNetV2.pth"
+  MASK_ON: False
+  RESNETS:
+    OUT_FEATURES: ["res4"]
+    RES2_OUT_CHANNELS: 24
+SOLVER:
+  IMS_PER_BATCH: 8
+  BASE_LR: 0.01
+DATASETS:
+  TRAIN: ("domain_day_train","domain_night_train")
+  TEST: ("domain_day_test","domain_night_test")
+OUTPUT_DIR: "logs"

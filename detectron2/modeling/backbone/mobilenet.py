@@ -130,14 +130,28 @@ class MobileNetV2(Backbone):
                 input_channel = output_channel
         # building last several layers
         features.append(ConvBNReLU(input_channel, self.last_channel, kernel_size=1))
+
+        assert len(features) == 19, len(features)
+        if "linear" or "res5" in out_features:
+            features = features[:19]
+        elif "res4" in out_features:
+            features = features[:14]
+        elif "res3" in out_features:
+            features = features[:7]
+        elif "res2" in out_features:
+            features = features[:4]
+        else:
+            raise ValueError(f"Something wrong with out_features, {out_features}")
+
         # make it nn.Sequential
         self.features = nn.Sequential(*features)
 
         # building classifier
-        self.classifier = nn.Sequential(
-            nn.Dropout(0.2),
-            nn.Linear(self.last_channel, num_classes),
-        )
+        if "linear" in out_features:
+            self.classifier = nn.Sequential(
+                nn.Dropout(0.2),
+                nn.Linear(self.last_channel, num_classes),
+            )
 
         # weight initialization
         for m in self.modules():
