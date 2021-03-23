@@ -165,15 +165,8 @@ class MobileNetV2(Backbone):
         outputs = {}
         for i, layer in enumerate(self.features):
             x = layer(x)
-            if i == 3:
-                outputs["c2"] = x
-            if i == 6:
-                outputs["c3"] = x
-            if i == 13:
-                outputs["c4"] = x
-            if i == 17:
-                outputs["c5"] = x
-                break
+            print(i, x.shape)
+        assert False
         return outputs
 
     def output_shape(self):
