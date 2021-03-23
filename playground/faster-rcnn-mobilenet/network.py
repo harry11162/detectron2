@@ -143,6 +143,7 @@ class MyNetwork(nn.Module):
             gt_instances = None
 
         features = self.backbone(images.tensor)
+        print(features.keys())
 
         if self.proposal_generator is not None:
             proposals, proposal_losses = self.proposal_generator(images, features, gt_instances)
