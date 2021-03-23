@@ -174,11 +174,11 @@ class MobileNetV2(Backbone):
             print(i, x.shape)
             if i == 3:
                 stage_name = "res2"
-            if i == 6:
+            elif i == 6:
                 stage_name = "res3"
-            if i == 13:
+            elif i == 13:
                 stage_name = "res4"
-            if i == 18:
+            elif i == 18:
                 stage_name = "res5"
             else:
                 stage_name = None
