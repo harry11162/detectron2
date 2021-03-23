@@ -176,7 +176,7 @@ class MobileNetV2(Backbone):
                 stage_name = "res4"
             if i == 18:
                 stage_name = "res5"
-                
+
             if stage_name in self.out_features:
                 outputs[stage_name] = x
                 if stage_name == self.out_features[-1]:
@@ -184,12 +184,14 @@ class MobileNetV2(Backbone):
         return outputs
 
     def output_shape(self):
-        return {
+        shapes = {
             "res2": ShapeSpec(channels=24, stride=4),
             "res3": ShapeSpec(channels=32, stride=8),
             "res4": ShapeSpec(channels=96, stride=16),
             "res5": ShapeSpec(channels=1280, stride=32),
         }
+        output_shape = {name: shapes[name] for name in self.out_features}
+        return output_shape
 
 
 @BACKBONE_REGISTRY.register()
