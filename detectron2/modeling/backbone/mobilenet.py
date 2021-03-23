@@ -169,6 +169,8 @@ class MobileNetV2(Backbone):
         print(self.out_features)
         for i, layer in enumerate(self.features):
             x = layer(x)
+            import pdb
+            pdb.set_trace()
             print(i, x.shape)
             if i == 3:
                 stage_name = "res2"
