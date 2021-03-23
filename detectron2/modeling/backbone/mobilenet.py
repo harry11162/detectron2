@@ -176,6 +176,8 @@ class MobileNetV2(Backbone):
                 stage_name = "res4"
             if i == 18:
                 stage_name = "res5"
+            else:
+                stage_name = None
 
             if stage_name in self.out_features:
                 outputs[stage_name] = x
