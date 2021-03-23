@@ -142,7 +142,6 @@ class MobileNetV2(Backbone):
             features = features[:4]
         else:
             raise ValueError(f"Something wrong with out_features, {out_features}")
-        print(len(features))
 
         # make it nn.Sequential
         self.features = nn.Sequential(*features)
