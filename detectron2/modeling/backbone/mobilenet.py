@@ -131,10 +131,8 @@ class MobileNetV2(Backbone):
         # building last several layers
         features.append(ConvBNReLU(input_channel, self.last_channel, kernel_size=1))
 
-        import pdb
-        pdb.set_trace()
         assert len(features) == 19, len(features)
-        if "linear" or "res5" in out_features:
+        if "linear" in out_features or "res5" in out_features:
             features = features[:19]
         elif "res4" in out_features:
             features = features[:14]
