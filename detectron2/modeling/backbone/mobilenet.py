@@ -169,6 +169,7 @@ class MobileNetV2(Backbone):
         print(self.out_features)
         for i, layer in enumerate(self.features):
             x = layer(x)
+            print(i, x.shape)
             if i == 3:
                 stage_name = "res2"
             if i == 6:
@@ -184,7 +185,6 @@ class MobileNetV2(Backbone):
                 outputs[stage_name] = x
                 if stage_name == self.out_features[-1]:
                     break
-        print(outputs.keys())
         return outputs
 
     def output_shape(self):
