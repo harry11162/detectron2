@@ -79,7 +79,8 @@ class MobileNetV2(Backbone):
                  width_mult=1.0,
                  inverted_residual_setting=None,
                  round_nearest=8,
-                 block=None):
+                 block=None,
+                 out_features=[],):
         """
         MobileNet V2 main class
 
@@ -151,6 +152,8 @@ class MobileNetV2(Backbone):
                 nn.init.normal_(m.weight, 0, 0.01)
                 nn.init.zeros_(m.bias)
 
+        self.out_features = out_features
+
     # def _forward_impl(self, x):
     #     # This exists since TorchScript doesn't support inheritance, so the superclass method
     #     # (this one) needs to have a name other than `forward` that can be accessed in a subclass
@@ -166,8 +169,17 @@ class MobileNetV2(Backbone):
         print('begin', x.shape)
         for i, layer in enumerate(self.features):
             x = layer(x)
-            print(i, x.shape)
-        assert False
+            if i == 3:
+                stage_name = "res2"
+            if i == 6:
+                stage_name = "res3"
+            if i == 13:
+                stage_name = "res4"
+            if i == 18:
+                stage_name = "res5"
+            outputs[stage_name] = x
+            if stage_name == self.out_features[-1]:
+                break
         return outputs
 
     def output_shape(self):
@@ -175,7 +187,7 @@ class MobileNetV2(Backbone):
             "res2": ShapeSpec(channels=24, stride=4),
             "res3": ShapeSpec(channels=32, stride=8),
             "res4": ShapeSpec(channels=96, stride=16),
-            "res5": ShapeSpec(channels=320, stride=32),
+            "res5": ShapeSpec(channels=1280, stride=32),
         }
 
 
