@@ -15,7 +15,7 @@ from detectron2.utils.logger import log_first_n
 
 from detectron2.layers import ShapeSpec
 
-from detectron2.modeling.backbone.mobilenet import build_mobilenetv2_backbone
+from detectron2.modeling.backbone.weight_input_condconv_resnet import build_weight_input_cond_conv_resnet_backbone
 from detectron2.modeling.backbone import Backbone, build_backbone
 from detectron2.modeling.backbone.fpn import build_custom_backbone_fpn
 from detectron2.modeling.postprocessing import detector_postprocess
@@ -50,7 +50,8 @@ class MyNetwork(nn.Module):
             vis_period: the period to run visualization. Set to 0 to disable.
         """
         super().__init__()
-        self.backbone = build_mobilenetv2_backbone(cfg)
+        backbone = build_weight_input_cond_conv_resnet_backbone(cfg, ShapeSpec(channels=3))
+        self.backbone = build_custom_backbone_fpn(cfg, backbone)
         self.proposal_generator = build_proposal_generator(cfg, self.backbone.output_shape())
         self.roi_heads = build_roi_heads(cfg, self.backbone.output_shape())
 
@@ -64,12 +65,6 @@ class MyNetwork(nn.Module):
         assert (
             self.pixel_mean.shape == self.pixel_std.shape
         ), f"{self.pixel_mean} and {self.pixel_std} have different shapes!"
-
-        D = cfg.MODEL.RESNETS.HARD_GENERATE.IN_CHANNELS
-        ws = torch.tensor(range(1, D // 2 + 1), dtype=self.pixel_mean.dtype, device=self.pixel_mean.device)
-        ws = 1 / (10000 ** (ws * 2 / D))
-        self.ws = ws
-        
 
     @property
     def device(self):
@@ -142,7 +137,9 @@ class MyNetwork(nn.Module):
         else:
             gt_instances = None
 
-        features = self.backbone(images.tensor)
+        features = self.backbone.bottom_up(images.tensor)  # the real backbone
+        routing_weights = features["routing_weights"]
+        features = self.backbone(None, features=features)  # FPN
 
         if self.proposal_generator is not None:
             proposals, proposal_losses = self.proposal_generator(images, features, gt_instances)
@@ -160,7 +157,7 @@ class MyNetwork(nn.Module):
         losses = {}
         losses.update(detector_losses)
         losses.update(proposal_losses)
-        return losses
+        return losses, routing_weights
 
     def inference(
         self,
@@ -189,7 +186,8 @@ class MyNetwork(nn.Module):
 
         images = self.preprocess_image(batched_inputs)
 
-        features = self.backbone(images.tensor)
+        features = self.backbone.bottom_up(images.tensor, batched_inputs[0]["routing_weights"])  # the real backbone
+        features = self.backbone(None, features=features)  # FPN
 
         if detected_instances is None:
             if self.proposal_generator is not None:

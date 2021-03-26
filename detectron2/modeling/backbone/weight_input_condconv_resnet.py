@@ -522,7 +522,7 @@ class ResNet(Backbone):
         """
         Args:
             x: Tensor of shape (N,C,H,W). H, W must be a multiple of ``self.size_divisibility``.
-            routing_weights: dict[str->Tensor(N,C)] routing weights for named block
+            routing_weights: list[Tensor(N,C)] routing weights for each condconv block
 
         Returns:
             dict[str->Tensor]: names and the corresponding features
