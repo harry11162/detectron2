@@ -1,0 +1,17 @@
+_BASE_: "../../configs/Base-RCNN-C4.yaml"
+MODEL:
+  WEIGHTS: "../../pretrain_models/R-18-condconv-res345-8.pth"
+  MASK_ON: False
+  RESNETS:
+    DEPTH: 18
+    RES2_OUT_CHANNELS: 64
+    COND_CONV_ON_PER_STAGE: [False, True, True, True]
+    COND_CONV_NUM_EXPERTS: 8
+    COND_CONV_DROPOUT_RATE: 0.
+SOLVER:
+  IMS_PER_BATCH: 8
+  BASE_LR: 0.01
+DATASETS:
+  TRAIN: ("domain_train",)
+  TEST: ("domain_test",)
+OUTPUT_DIR: "logs"
