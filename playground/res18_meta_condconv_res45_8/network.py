@@ -212,7 +212,7 @@ class MyNetwork(nn.Module):
             hour = time_captured.hour
             minute = time_captured.minute
             second = time_captured.second
-            month = month + date/30
+            month = month + day/30
             time_captured = (((second / 60 + minute) / 60) + hour) / 24
             
             altitude = i["altitude"]
