@@ -136,8 +136,7 @@ class MyNetwork(nn.Module):
         else:
             gt_instances = None
 
-        features = self.backbone.bottom_up(images.tensor)  # the real backbone
-        features = self.backbone(None, features=features)  # FPN
+        features = self.backbone(images.tensor)  # the real backbone
 
         if self.proposal_generator is not None:
             proposals, proposal_losses = self.proposal_generator(images, features, gt_instances)
@@ -184,8 +183,7 @@ class MyNetwork(nn.Module):
 
         images = self.preprocess_image(batched_inputs)
 
-        features = self.backbone.bottom_up(images.tensor)  # the real backbone
-        features = self.backbone(None, features=features)  # FPN
+        features = self.backbone(images.tensor)  # the real backbone
 
         if detected_instances is None:
             if self.proposal_generator is not None:
