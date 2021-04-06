@@ -142,17 +142,17 @@ class MyNetwork(nn.Module):
             time_captured = datetime.fromtimestamp(time_captured / 1e9)
             time_captured = time_captured.astimezone(pytz.timezone("US/Pacific"))
             month = time_captured.month
-            date = time_captured.date
             hour = time_captured.hour
             minute = time_captured.minute
             second = time_captured.second
-            month = month + date/30
+            month_captured = [0.] * 12
+            month_captured[month - 1] = 1.
             time_captured = (((second / 60 + minute) / 60) + hour) / 24
             
             altitude = i["altitude"]
             latitude = i["latitude"]
             longitude = i["longitude"]
-            metas.append([month, time_captured, altitude, latitude, longitude])
+            metas.append(month_captured + [time_captured, altitude, latitude, longitude])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
         features = self.backbone(images.tensor, metas)  # the real backbone
@@ -208,17 +208,17 @@ class MyNetwork(nn.Module):
             time_captured = datetime.fromtimestamp(time_captured / 1e9)
             time_captured = time_captured.astimezone(pytz.timezone("US/Pacific"))
             month = time_captured.month
-            date = time_captured.date
             hour = time_captured.hour
             minute = time_captured.minute
             second = time_captured.second
-            month = month + day/30
+            month_captured = [0.] * 12
+            month_captured[month - 1] = 1.
             time_captured = (((second / 60 + minute) / 60) + hour) / 24
             
             altitude = i["altitude"]
             latitude = i["latitude"]
             longitude = i["longitude"]
-            metas.append([month, time_captured, altitude, latitude, longitude])
+            metas.append(month_captured + [time_captured, altitude, latitude, longitude])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
         features = self.backbone(images.tensor, metas)  # the real backbone
