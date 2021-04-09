@@ -3,8 +3,9 @@ MODEL:
   WEIGHTS: "../../pretrain_models/R-50-condconv-8.pkl"
   MASK_ON: False
   RESNETS:
-    DEPTH: 50
-    COND_CONV_ON_PER_STAGE: [False, False, False, True]
+    DEPTH: 18
+    RES2_OUT_CHANNELS: 64
+    COND_CONV_ON_PER_STAGE: [False, False, True, True]
     COND_CONV_NUM_EXPERTS: 8
     COND_CONV_DROPOUT_RATE: 0.
 SOLVER:
