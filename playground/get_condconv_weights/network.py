@@ -50,8 +50,7 @@ class MyNetwork(nn.Module):
             vis_period: the period to run visualization. Set to 0 to disable.
         """
         super().__init__()
-        backbone = build_weight_output_cond_conv_resnet_backbone(cfg, ShapeSpec(channels=3))
-        self.backbone = build_custom_backbone_fpn(cfg, backbone)
+        self.backbone = build_weight_output_cond_conv_resnet_backbone(cfg, ShapeSpec(channels=3))
         self.proposal_generator = build_proposal_generator(cfg, self.backbone.output_shape())
         self.roi_heads = build_roi_heads(cfg, self.backbone.output_shape())
 
