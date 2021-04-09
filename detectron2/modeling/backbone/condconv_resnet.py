@@ -133,6 +133,7 @@ class CondConvBasicBlock(CNNBlockBase):
                 kernel_size=1,
                 stride=stride,
                 bias=False,
+                num_experts=cond_conv_num_experts,
                 norm=get_norm(norm, out_channels),
             )
         else:
@@ -145,6 +146,7 @@ class CondConvBasicBlock(CNNBlockBase):
             stride=stride,
             padding=1,
             bias=False,
+            num_experts=cond_conv_num_experts,
             norm=get_norm(norm, out_channels),
         )
 
@@ -155,6 +157,7 @@ class CondConvBasicBlock(CNNBlockBase):
             stride=1,
             padding=1,
             bias=False,
+            num_experts=cond_conv_num_experts,
             norm=get_norm(norm, out_channels),
         )
 
