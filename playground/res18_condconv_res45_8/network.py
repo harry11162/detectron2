@@ -197,6 +197,9 @@ class MyNetwork(nn.Module):
             detected_instances = [x.to(self.device) for x in detected_instances]
             results = self.roi_heads.forward_with_given_boxes(features, detected_instances)
 
+        import pdb
+        pdb.set_trace()
+
         if do_postprocess:
             assert not torch.jit.is_scripting(), "Scripting is not supported for postprocess."
             return MyNetwork._postprocess(results, batched_inputs, images.image_sizes)
