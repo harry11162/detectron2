@@ -640,7 +640,7 @@ class ResNet(Backbone):
             # If the block is CondConvBlock,
             # give it meta to compute routing weight.
             for block in stage:
-                if isinstance(block, CondConvBottleneckBlock):
+                if isinstance(block, CondConvBottleneckBlock) or isinstance(block, CondConvBasicBlock):
                     x = block(x, meta)
                 else:
                     x = block(x)
