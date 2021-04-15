@@ -100,6 +100,97 @@ class BasicBlock(CNNBlockBase):
         return out
 
 
+class CondConvBasicBlock(CNNBlockBase):
+    """
+    The basic residual block for ResNet-18 and ResNet-34 defined in :paper:`ResNet`,
+    with two 3x3 conv layers and a projection shortcut if needed.
+    """
+
+    def __init__(self, in_channels, out_channels, *, stride=1, norm="BN",
+        cond_conv_num_experts=8,
+        cond_conv_dropout_rate=0.,
+        meta_channels=1,
+        routing_inner_channels=16,
+    ):
+        """
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            stride (int): Stride for the first conv.
+            norm (str or callable): normalization for all conv layers.
+                See :func:`layers.get_norm` for supported format.
+        """
+        super().__init__(in_channels, out_channels, stride)
+
+        self.cond_conv_num_experts = cond_conv_num_experts
+        self.cond_conv_dropout_rate = cond_conv_dropout_rate
+
+        self.route_func = nn.Sequential(
+            nn.Linear(meta_channels, routing_inner_channels),
+            nn.Sigmoid(),
+            nn.Linear(routing_inner_channels, routing_inner_channels),
+            nn.Sigmoid(),
+            nn.Linear(routing_inner_channels, cond_conv_num_experts),
+            nn.Sigmoid(),
+            nn.Dropout(cond_conv_dropout_rate),
+        )
+
+        if in_channels != out_channels:
+            self.shortcut = CondConv2d(
+                in_channels,
+                out_channels,
+                kernel_size=1,
+                stride=stride,
+                bias=False,
+                num_experts=cond_conv_num_experts,
+                norm=get_norm(norm, out_channels),
+            )
+        else:
+            self.shortcut = None
+
+        self.conv1 = CondConv2d(
+            in_channels,
+            out_channels,
+            kernel_size=3,
+            stride=stride,
+            padding=1,
+            bias=False,
+            num_experts=cond_conv_num_experts,
+            norm=get_norm(norm, out_channels),
+        )
+
+        self.conv2 = CondConv2d(
+            out_channels,
+            out_channels,
+            kernel_size=3,
+            stride=1,
+            padding=1,
+            bias=False,
+            num_experts=cond_conv_num_experts,
+            norm=get_norm(norm, out_channels),
+        )
+
+        for layer in [self.conv1, self.conv2, self.shortcut]:
+            if layer is not None:  # shortcut can be None
+                weight_init.c2_msra_fill(layer)
+
+    def forward(self, x, meta):
+        routing_weight = self.route_func(meta)
+
+        out = self.conv1(x, routing_weight)
+        out = F.relu_(out)
+        out = self.conv2(out, routing_weight)
+
+        if self.shortcut is not None:
+            shortcut = self.shortcut(x, routing_weight)
+        else:
+            shortcut = x
+
+        out += shortcut
+        out = F.relu_(out)
+        return out
+
+
 class BottleneckBlock(CNNBlockBase):
     """
     The standard bottleneck residual block used by ResNet-50, 101 and 152
@@ -750,7 +841,14 @@ def build_meta_cond_conv_resnet_backbone(cfg, input_shape):
         }
         # Use BasicBlock for R18 and R34.
         if depth in [18, 34]:
-            stage_kargs["block_class"] = BasicBlock
+            if cond_conv_on_per_stage[idx]:
+                stage_kargs["block_class"] = CondConvBasicBlock
+                stage_kargs["cond_conv_num_experts"] = cond_conv_num_experts
+                stage_kargs["cond_conv_dropout_rate"] = cond_conv_dropout_rate
+                stage_kargs["meta_channels"] = meta_channels
+                stage_kargs["routing_inner_channels"] = routing_inner_channels
+            else:
+                stage_kargs["block_class"] = BasicBlock
         else:
             stage_kargs["bottleneck_channels"] = bottleneck_channels
             stage_kargs["stride_in_1x1"] = stride_in_1x1

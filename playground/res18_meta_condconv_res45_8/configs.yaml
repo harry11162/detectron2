@@ -1,6 +1,6 @@
 _BASE_: "../../configs/Base-RCNN-C4.yaml"
 MODEL:
-  WEIGHTS: "../../pretrain_models/R-18-condconv-res45-8.pth"
+  WEIGHTS: "../../pretrain_models/R-18-condconv-res45-8-noise.pth"
   MASK_ON: False
   RESNETS:
     DEPTH: 18
