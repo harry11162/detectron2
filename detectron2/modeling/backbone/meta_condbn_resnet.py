@@ -763,7 +763,7 @@ def make_stage(*args, **kwargs):
 
 
 @BACKBONE_REGISTRY.register()
-def build_resnet_backbone(cfg, input_shape):
+def build_meta_condbn_resnet_backbone(cfg, input_shape):
     """
     Create a ResNet instance from config.
 
