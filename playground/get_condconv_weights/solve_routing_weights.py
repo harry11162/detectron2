@@ -140,19 +140,23 @@ def do_train(cfg, model, resume=False):
 
     logger.info("Starting solving optimized routing weights")
 
-    all_routing_weights = []
+    gammas = []
+    betas = []
     with EventStorage(start_iter=0) as storage:
         for data, iteration in zip(data_loader, range(num_images)):
             storage.iter = iteration
             print(iteration)
             with torch.no_grad():
-                routing_weights = model(data)
-            all_routing_weights.append(routing_weights)
-            print(routing_weights.shape)
+                gamma, beta = model(data)
+            gammas.append(gamma)
+            betas.append(beta)
+            print(gamma.shape)
     
-    routing_weights = torch.cat(all_routing_weights).cpu()
-    torch.save(routing_weights, "routing_weights.pth")
-    return routing_weights
+    gammas = torch.cat(gammas).cpu()
+    betas = torch.cat(betas).cpu()
+    torch.save(gammas, "gammas.pth")
+    torch.save(betas, "betas.pth")
+    return gammas, betas
 
 
 def setup(args):
@@ -162,8 +166,8 @@ def setup(args):
     register_coco_instances("domain", {}, "domain/annotations.json", "domain")
     register_coco_instances("domain_train", {}, "domain/train_annotations.json", "domain")
     register_coco_instances("domain_test", {}, "domain/test_annotations.json", "domain")
-    register_coco_instances("routine_train", {}, "domain/train_routine_5fc766.json", "domain")
-    register_coco_instances("routine_test", {}, "domain/train_routine_5fc766.json", "domain")
+    register_coco_instances("routine_train", {}, "domain/test_routine_5fc877.json", "domain")
+    register_coco_instances("routine_test", {}, "domain/test_routine_5fc877.json", "domain")
     cfg = get_cfg()
     assert args.config_file == "", f"This code automatically uses the config file in this directory"
     args.config_file = "configs.yaml"

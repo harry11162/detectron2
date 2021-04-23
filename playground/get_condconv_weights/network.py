@@ -15,7 +15,7 @@ from detectron2.utils.logger import log_first_n
 
 from detectron2.layers import ShapeSpec
 
-from detectron2.modeling.backbone.meta_condconv_resnet import build_meta_cond_conv_resnet_backbone
+from detectron2.modeling.backbone.meta_condbn_resnet import build_meta_condbn_resnet_backbone
 from detectron2.modeling.backbone import Backbone, build_backbone
 from detectron2.modeling.backbone.fpn import build_custom_backbone_fpn
 from detectron2.modeling.postprocessing import detector_postprocess
@@ -50,7 +50,7 @@ class MyNetwork(nn.Module):
             vis_period: the period to run visualization. Set to 0 to disable.
         """
         super().__init__()
-        self.backbone = build_meta_cond_conv_resnet_backbone(cfg, ShapeSpec(channels=3))
+        self.backbone = build_meta_condbn_resnet_backbone(cfg, ShapeSpec(channels=3))
         self.proposal_generator = build_proposal_generator(cfg, self.backbone.output_shape())
         self.roi_heads = build_roi_heads(cfg, self.backbone.output_shape())
 
@@ -189,25 +189,20 @@ class MyNetwork(nn.Module):
             time_captured = i["date_captured"]
             time_captured = datetime.fromtimestamp(time_captured / 1e9)
             time_captured = time_captured.astimezone(pytz.timezone("US/Pacific"))
-            month = time_captured.month
-            hour = time_captured.hour
-            minute = time_captured.minute
-            second = time_captured.second
-            month_captured = [0.] * 12
-            month_captured[month - 1] = 1.
-            time_captured = (((second / 60 + minute) / 60) + hour) / 24
-            
+
             altitude = i["altitude"]
             latitude = i["latitude"]
             longitude = i["longitude"]
-            metas.append(month_captured + [time_captured, altitude, latitude, longitude])
+            solar_angle = pysolar.solar.get_altitude(latitude, longitude, time_captured)
+            
+            metas.append([solar_angle, altitude, latitude, longitude])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
-        print(metas[0, -4:])
         features = self.backbone(images.tensor, metas)
-        routing_weights = features["routing_weights"]
-        print(routing_weights)
-        return routing_weights
+        gamma = features["gamma"]
+        beta = features["beta"]
+        print(gamma[0, 0:5], gamma[0, 200:205])
+        return gamma, beta
 
         if detected_instances is None:
             if self.proposal_generator is not None:
