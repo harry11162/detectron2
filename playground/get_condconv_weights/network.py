@@ -184,7 +184,26 @@ class MyNetwork(nn.Module):
 
         images = self.preprocess_image(batched_inputs)
 
-        features = self.backbone(images.tensor)
+        metas = []
+        for i in batched_inputs:
+            time_captured = i["date_captured"]
+            time_captured = datetime.fromtimestamp(time_captured / 1e9)
+            time_captured = time_captured.astimezone(pytz.timezone("US/Pacific"))
+            month = time_captured.month
+            hour = time_captured.hour
+            minute = time_captured.minute
+            second = time_captured.second
+            month_captured = [0.] * 12
+            month_captured[month - 1] = 1.
+            time_captured = (((second / 60 + minute) / 60) + hour) / 24
+            
+            altitude = i["altitude"]
+            latitude = i["latitude"]
+            longitude = i["longitude"]
+            metas.append(month_captured + [time_captured, altitude, latitude, longitude])
+        metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
+
+        features = self.backbone(images.tensor, metas)
         routing_weights = features["routing_weights"]
         return routing_weights
 
