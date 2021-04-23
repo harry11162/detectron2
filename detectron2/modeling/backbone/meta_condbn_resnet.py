@@ -661,7 +661,7 @@ class ResNet(Backbone):
         gammas = torch.cat(gammas, dim=1)
         betas = torch.cat(betas, dim=1)
         outputs["gamma"] = gammas
-        outputs["betas"] = betas
+        outputs["beta"] = betas
         return outputs
 
     def output_shape(self):
