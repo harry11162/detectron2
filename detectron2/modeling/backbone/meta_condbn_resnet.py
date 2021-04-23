@@ -181,10 +181,14 @@ class CondBNBasicBlock(CNNBlockBase):
 
     def forward(self, x, meta):
         out = self.conv1(x)
-        out = out * self.cond_gamma1(meta)[:, :, None, None] + self.cond_beta1(meta)[:, :, None, None]
+        gamma1 = self.cond_gamma1(meta)
+        beta1 = self.cond_beta1(meta)
+        out = out * gamma1[:, :, None, None] + beta1[:, :, None, None]
         out = F.relu_(out)
         out = self.conv2(out)
-        out = out * self.cond_gamma2(meta)[:, :, None, None] + self.cond_beta2(meta)[:, :, None, None]
+        gamma2 = self.cond_gamma2(meta)
+        beta2 = self.cond_beta2(meta)
+        out = out * gamma2[:, :, None, None] + beta2[:, :, None, None]
 
         if self.shortcut is not None:
             shortcut = self.shortcut(x)
@@ -193,7 +197,10 @@ class CondBNBasicBlock(CNNBlockBase):
 
         out += shortcut
         out = F.relu_(out)
-        return out
+
+        gamma = torch.cat([gamma1, gamma2], dim=1)
+        beta = torch.cat([beta1, beta2], dim=1)
+        return out, gamma, beta
 
 
 class BottleneckBlock(CNNBlockBase):
@@ -630,13 +637,17 @@ class ResNet(Backbone):
         """
         assert x.dim() == 4, f"ResNet takes an input of shape (N, C, H, W). Got {x.shape} instead!"
         outputs = {}
+        gammas = []
+        betas = []
         x = self.stem(x)
         if "stem" in self._out_features:
             outputs["stem"] = x
         for name, stage in zip(self.stage_names, self.stages):
             for block in stage:
                 if isinstance(block, CondBNBasicBlock):
-                    x = block(x, meta)
+                    x, gamma, beta = block(x, meta)
+                    gammas.append(gamma)
+                    betas.append(beta)
                 else:
                     x = block(x)
             if name in self._out_features:
@@ -647,6 +658,10 @@ class ResNet(Backbone):
             x = self.linear(x)
             if "linear" in self._out_features:
                 outputs["linear"] = x
+        gammas = torch.cat(gammas, dim=1)
+        betas = torch.cat(betas, dim=1)
+        outputs["gamma"] = gammas
+        outputs["betas"] = betas
         return outputs
 
     def output_shape(self):
