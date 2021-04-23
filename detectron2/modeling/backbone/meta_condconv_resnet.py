@@ -188,7 +188,7 @@ class CondConvBasicBlock(CNNBlockBase):
 
         out += shortcut
         out = F.relu_(out)
-        return out
+        return out, routing_weight
 
 
 class BottleneckBlock(CNNBlockBase):
@@ -633,6 +633,7 @@ class ResNet(Backbone):
         assert x.dim() == 4, f"ResNet takes an input of shape (N, C, H, W). Got {x.shape} instead!"
         assert meta.dim() == 2, f"It takes a meta of shape (N, C). Got {meta.shape} instead!"
         outputs = {}
+        routing_weights = []
         x = self.stem(x)
         if "stem" in self._out_features:
             outputs["stem"] = x
@@ -641,7 +642,8 @@ class ResNet(Backbone):
             # give it meta to compute routing weight.
             for block in stage:
                 if isinstance(block, CondConvBottleneckBlock) or isinstance(block, CondConvBasicBlock):
-                    x = block(x, meta)
+                    x, routing_weight = block(x, meta)
+                    routing_weights.append(routing_weight)
                 else:
                     x = block(x)
             if name in self._out_features:
@@ -652,6 +654,8 @@ class ResNet(Backbone):
             x = self.linear(x)
             if "linear" in self._out_features:
                 outputs["linear"] = x
+        routing_weights = torch.cat(routing_weights, dim=1)
+        outputs["routing_weights"] = routing_weights
         return outputs
 
     def output_shape(self):
