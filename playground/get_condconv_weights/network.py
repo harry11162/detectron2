@@ -3,6 +3,7 @@ import logging
 import numpy as np
 from datetime import datetime
 import pytz
+import pysolar.solar
 from typing import Dict, List, Optional, Tuple
 import torch
 from torch import nn
