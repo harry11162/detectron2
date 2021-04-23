@@ -134,9 +134,9 @@ def do_train(cfg, model, resume=False):
     model.load_state_dict(model_weights, strict=True)  # should better set True for once to see if it's loaded right
 
     assert cfg.SOLVER.IMS_PER_BATCH == 1, f"should set batchsize=1"
-    sampler = torch.utils.data.sampler.SequentialSampler(range(3450))
+    sampler = torch.utils.data.sampler.SequentialSampler(range(3239))
     data_loader = build_detection_train_loader(cfg, sampler=sampler, aspect_ratio_grouping=False)
-    num_images = 3450
+    num_images = 3239
 
     logger.info("Starting solving optimized routing weights")
 
