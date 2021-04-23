@@ -206,6 +206,7 @@ class MyNetwork(nn.Module):
         print(metas[0, -4:])
         features = self.backbone(images.tensor, metas)
         routing_weights = features["routing_weights"]
+        print(routing_weights)
         return routing_weights
 
         if detected_instances is None:
