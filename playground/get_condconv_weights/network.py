@@ -203,6 +203,7 @@ class MyNetwork(nn.Module):
             metas.append(month_captured + [time_captured, altitude, latitude, longitude])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
+        print(metas[0, -4:])
         features = self.backbone(images.tensor, metas)
         routing_weights = features["routing_weights"]
         return routing_weights
