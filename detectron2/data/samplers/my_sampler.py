@@ -1,5 +1,6 @@
 import torch
 import itertools
+from typing import Optional
 from torch.utils.data.sampler import Sampler
 
 class VFSPairSampler(Sampler):
