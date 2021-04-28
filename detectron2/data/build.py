@@ -19,7 +19,7 @@ from .catalog import DatasetCatalog, MetadataCatalog
 from .common import AspectRatioGroupedDataset, DatasetFromList, MapDataset
 from .dataset_mapper import DatasetMapper
 from .detection_utils import check_metadata_consistency
-from .samplers import InferenceSampler, RepeatFactorTrainingSampler, TrainingSampler
+from .samplers import InferenceSampler, RepeatFactorTrainingSampler, TrainingSampler, VFSPairSampler
 
 """
 This file contains the default logic to build a dataloader for training or testing.
