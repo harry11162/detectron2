@@ -158,7 +158,7 @@ class MyNetwork(nn.Module):
         N = images.tensor.size(0)
         vfs_losses = []
         for i in range(0, N, step=2):
-            vfs_loss = self.simsiam_head.loss(p[i], z[i], p[i+1], z[i+1])
+            vfs_loss = self.simsiam_head.loss(ps[i], zs[i], ps[i+1], zs[i+1])
             vfs_losses.append(vfs_loss)
         vfs_losses = torch.stack(vfs_losses).mean()
         vfs_losses = {"vfs_loss": vfs_losses}
