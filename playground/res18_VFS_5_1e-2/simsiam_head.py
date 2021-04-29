@@ -86,6 +86,8 @@ class SimSiamHead(nn.Module):
         else:
             self.convs = nn.Identity()
 
+        import pdb
+        pdb.set_trace()
         projection_fcs = []
         for i in range(num_projection_fcs):
             is_last = i == num_projection_fcs - 1
