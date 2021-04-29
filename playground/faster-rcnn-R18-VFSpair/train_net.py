@@ -157,8 +157,12 @@ def do_train(cfg, model, resume=False):
         for data, iteration in zip(data_loader, range(start_iter, max_iter)):
             storage.iter = iteration
 
-            import pdb
-            pdb.set_trace()
+            N = len(data)
+            intervals = []
+            for i in range(N, step=2):
+                interval = abs(data[i]['date_captured'] - data[i+1]['date_captured']) // int(1e9)
+                intervals.append(interval)
+            print(intervals)
 
             loss_dict = model(data)
             losses = sum(loss_dict.values())
