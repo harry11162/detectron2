@@ -27,7 +27,6 @@ class VFSPairSampler(Sampler):
         self.sample_range = sample_range
 
     def __iter__(self):
-        print(self._rank, self._world_size)
         start = self._rank
         for i in itertools.islice(self._infinite_indices(), start, None, self._world_size):
             yield i
