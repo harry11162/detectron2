@@ -169,10 +169,10 @@ class CondBNBasicBlock(CNNBlockBase):
             norm=get_norm(norm, out_channels),
         )
 
-        self.cond_gamma1 = nn.Parameter(torch.empty(num_experts, out_channels))
-        self.cond_beta1 = nn.Parameter(torch.empty(num_experts, out_channels))
-        self.cond_gamma2 = nn.Parameter(torch.empty(num_experts, out_channels))
-        self.cond_beta2 = nn.Parameter(torch.empty(num_experts, out_channels))
+        self.cond_gamma1 = nn.Parameter(torch.ones(num_experts, out_channels))
+        self.cond_beta1 = nn.Parameter(torch.zeros(num_experts, out_channels))
+        self.cond_gamma2 = nn.Parameter(torch.ones(num_experts, out_channels))
+        self.cond_beta2 = nn.Parameter(torch.zeros(num_experts, out_channels))
 
         nn.init.constant_(self.cond_gamma1, 1.)
         nn.init.constant_(self.cond_gamma2, 1.)
@@ -186,13 +186,13 @@ class CondBNBasicBlock(CNNBlockBase):
 
     def forward(self, x, weight):
         out = self.conv1(x)
-        gamma1 = torch.mm(weight, self.cond_gamma1)
-        beta1 = torch.mm(weight, self.cond_beta1)
+        gamma1 = torch.matmul(weight, self.cond_gamma1)
+        beta1 = torch.matmul(weight, self.cond_beta1)
         out = out * gamma1[:, :, None, None] + beta1[:, :, None, None]
         out = F.relu_(out)
         out = self.conv2(out)
-        gamma2 = torch.mm(weight, self.cond_gamma2)
-        beta2 = torch.mm(weight, self.cond_beta2)
+        gamma2 = torch.matmul(weight, self.cond_gamma2)
+        beta2 = torch.matmul(weight, self.cond_beta2)
         out = out * gamma2[:, :, None, None] + beta2[:, :, None, None]
 
         if self.shortcut is not None:
