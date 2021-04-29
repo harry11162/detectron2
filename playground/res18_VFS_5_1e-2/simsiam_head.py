@@ -119,6 +119,8 @@ class SimSiamHead(nn.Module):
 
 
     def forward_projection(self, x):
+        import pdb
+        pdb.set_trace()
         x = self.convs(x)
         x = self.avg_pool(x)
         z = self.projection_fcs(x)
