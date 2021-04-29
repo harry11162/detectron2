@@ -144,6 +144,13 @@ class MyNetwork(nn.Module):
 
         features = self.backbone(images.tensor)
 
+        # check interval
+        N = images.tensor.size(0)
+        intervals = []
+        for i in range(0, N, step=2):
+            intervals.append(abs(batched_inputs[i]["time_captured"] - batched_inputs[i+1]["time_captured"]) // int(1e9))
+        print(intervals)
+
         # VFS
         assert len(features) == 0 and "res4" in features
         zs, ps = self.simsiam_head(features["res4"])
