@@ -33,7 +33,10 @@ class VFSPairSampler(Sampler):
             offset = torch.randint(self.sample_range, ()) + 1
             if torch.randint(2, ()) == 0:
                 offset = -offset
-            yield i + offset
+            j = i + offset
+            j = max(j, 0)
+            j = min(j, self._size - 1)
+            yield j
 
     def _infinite_indices(self):
         g = torch.Generator()
