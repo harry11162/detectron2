@@ -86,8 +86,6 @@ class SimSiamHead(nn.Module):
         else:
             self.convs = nn.Identity()
 
-        import pdb
-        pdb.set_trace()
         projection_fcs = []
         for i in range(num_projection_fcs):
             is_last = i == num_projection_fcs - 1
@@ -111,7 +109,7 @@ class SimSiamHead(nn.Module):
             predictor_fcs.append(nn.Linear(last_channels, out_channels))
             if not is_last:
                 predictor_fcs.append(nn.ReLU())
-        last_channels = out_channels
+            last_channels = out_channels
         if len(predictor_fcs):
             self.predictor_fcs = nn.Sequential(*predictor_fcs)
         else:
@@ -136,8 +134,6 @@ class SimSiamHead(nn.Module):
             torch.Tensor: The classification scores for input samples.
         """
         # [N, in_channels, 4, 7, 7]
-        import pdb
-        pdb.set_trace()
         x = self.convs(x)
         x = self.avg_pool(x)
         x = x.flatten(1)
