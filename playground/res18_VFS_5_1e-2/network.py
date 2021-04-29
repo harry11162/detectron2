@@ -158,7 +158,7 @@ class MyNetwork(nn.Module):
         zs = zs.reshape(N // 2, 2, -1)
         ps = ps.reshape(N // 2, 2, -1)
         vfs_losses = self.simsiam_head.loss(ps[:, 0], zs[:, 0], ps[:, 1], zs[:, 1])
-        vfs_losses = {"vfs_loss": vfs_losses}
+        vfs_losses = {"vfs_loss": vfs_losses.mean() * self.vfs_loss_weight}
 
         if self.proposal_generator is not None:
             proposals, proposal_losses = self.proposal_generator(images, features, gt_instances)
