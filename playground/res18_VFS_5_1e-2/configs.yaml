@@ -18,4 +18,6 @@ SOLVER:
 DATASETS:
   TRAIN: ("domain_train",)
   TEST: ("domain_test",)
+DATALOADER:
+  SAMPLER_TRAIN: VFSPairSampler
 OUTPUT_DIR: "logs"
