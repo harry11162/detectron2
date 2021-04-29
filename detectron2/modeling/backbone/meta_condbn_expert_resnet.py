@@ -649,6 +649,7 @@ class ResNet(Backbone):
         
         routing_weight = self.routing_func(meta)
         routing_weight = torch.sigmoid(routing_weight)
+        print(routing_weight[0])
 
         x = self.stem(x)
         if "stem" in self._out_features:
