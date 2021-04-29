@@ -157,7 +157,7 @@ class MyNetwork(nn.Module):
         N = images.tensor.size(0)
         zs = zs.reshape(N // 2, 2, -1)
         ps = ps.reshape(N // 2, 2, -1)
-        vfs_losses = self.simsiam_head.loss(ps[:, 0], z[:, 0], p[:, 1], z[:, 1])
+        vfs_losses = self.simsiam_head.loss(ps[:, 0], zs[:, 0], ps[:, 1], zs[:, 1])
         vfs_losses = {"vfs_loss": vfs_losses}
 
         if self.proposal_generator is not None:
