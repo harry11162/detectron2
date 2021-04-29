@@ -330,6 +330,8 @@ def _train_loader_from_config(cfg, mapper=None, *, dataset=None, sampler=None):
                 dataset, cfg.DATALOADER.REPEAT_THRESHOLD
             )
             sampler = RepeatFactorTrainingSampler(repeat_factors)
+        elif sampler_name == "VFSPairSampler":
+            sampler = VFSPairSampler(len(dataset), sample_range=3)
         else:
             raise ValueError("Unknown training sampler: {}".format(sampler_name))
 
