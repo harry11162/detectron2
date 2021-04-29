@@ -134,7 +134,7 @@ class SimSiamHead(nn.Module):
         """
         # [N, in_channels, 4, 7, 7]
         import pdb
-        pdb.set_trace())
+        pdb.set_trace()
         x = self.convs(x)
         x = self.avg_pool(x)
         z = self.projection_fcs(x)
