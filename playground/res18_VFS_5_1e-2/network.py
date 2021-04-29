@@ -58,7 +58,7 @@ class MyNetwork(nn.Module):
 
         # VFS
         self.simsiam_head = SimSiamHead(256)
-        self.vfs_loss_weight = cfg.MODEL.LOSS_WEIGHT
+        self.vfs_loss_weight = cfg.MODEL.VFS.LOSS_WEIGHT
 
         self.input_format = cfg.INPUT.FORMAT
         self.vis_period = cfg.VIS_PERIOD
