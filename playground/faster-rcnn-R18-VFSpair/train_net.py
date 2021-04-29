@@ -159,7 +159,7 @@ def do_train(cfg, model, resume=False):
 
             N = len(data)
             intervals = []
-            for i in range(N, step=2):
+            for i in range(0, N, 2):
                 interval = abs(data[i]['date_captured'] - data[i+1]['date_captured']) // int(1e9)
                 intervals.append(interval)
             print(intervals)
