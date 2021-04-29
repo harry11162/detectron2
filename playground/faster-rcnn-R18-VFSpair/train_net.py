@@ -163,6 +163,7 @@ def do_train(cfg, model, resume=False):
                 interval = abs(data[i]['date_captured'] - data[i+1]['date_captured']) // int(1e9)
                 intervals.append(interval)
             print(intervals)
+            print([i['date_captured'] for i in data])
 
             loss_dict = model(data)
             losses = sum(loss_dict.values())
