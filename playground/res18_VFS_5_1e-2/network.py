@@ -155,11 +155,9 @@ class MyNetwork(nn.Module):
         zs, ps = self.simsiam_head(features["res4"])
         # in VFSTrainSampler, (1,2), (3,4), (5,6), etc. are sampled near pairs
         N = images.tensor.size(0)
-        vfs_losses = []
-        for i in range(0, N, 2):
-            vfs_loss = self.simsiam_head.loss(ps[i], zs[i], ps[i+1], zs[i+1])
-            vfs_losses.append(vfs_loss)
-        vfs_losses = torch.stack(vfs_losses).mean()
+        zs = zs.reshape(N // 2, 2, -1)
+        ps = ps.reshape(N // 2, 2, -1)
+        vfs_losses = self.simsiam_head.loss(ps[:, 0], z[:, 0], p[:, 1], z[:, 1])
         vfs_losses = {"vfs_loss": vfs_losses}
 
         if self.proposal_generator is not None:
