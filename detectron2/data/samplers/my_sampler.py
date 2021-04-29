@@ -2,6 +2,7 @@ import torch
 import itertools
 from typing import Optional
 from torch.utils.data.sampler import Sampler
+from detectron2.utils import comm
 
 class VFSPairSampler(Sampler):
     def __init__(self, size: int, shuffle: bool = True, seed: Optional[int] = None, sample_range: int = 3):
