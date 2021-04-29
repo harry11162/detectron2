@@ -152,8 +152,6 @@ class MyNetwork(nn.Module):
         print(intervals)
 
         # VFS
-        print(features.keys())
-        assert len(features) == 0 and "res4" in features
         zs, ps = self.simsiam_head(features["res4"])
         # in VFSTrainSampler, (1,2), (3,4), (5,6), etc. are sampled near pairs
         N = images.tensor.size(0)
