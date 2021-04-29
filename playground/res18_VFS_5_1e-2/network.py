@@ -147,7 +147,7 @@ class MyNetwork(nn.Module):
         # check interval
         N = images.tensor.size(0)
         intervals = []
-        for i in range(0, N, step=2):
+        for i in range(0, N, 2):
             intervals.append(abs(batched_inputs[i]["time_captured"] - batched_inputs[i+1]["time_captured"]) // int(1e9))
         print(intervals)
 
@@ -157,7 +157,7 @@ class MyNetwork(nn.Module):
         # in VFSTrainSampler, (1,2), (3,4), (5,6), etc. are sampled near pairs
         N = images.tensor.size(0)
         vfs_losses = []
-        for i in range(0, N, step=2):
+        for i in range(0, N, 2):
             vfs_loss = self.simsiam_head.loss(ps[i], zs[i], ps[i+1], zs[i+1])
             vfs_losses.append(vfs_loss)
         vfs_losses = torch.stack(vfs_losses).mean()
