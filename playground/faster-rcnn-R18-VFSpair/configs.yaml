@@ -12,6 +12,6 @@ DATASETS:
   TRAIN: ("domain_train",)
   TEST: ("domain_test",)
 DATALOADER:
-  NUM_WORKERS: 0
+  NUM_WORKERS: 4
   SAMPLER_TRAIN: VFSPairSampler
 OUTPUT_DIR: "logs"
