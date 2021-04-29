@@ -134,6 +134,8 @@ class SimSiamHead(nn.Module):
             torch.Tensor: The classification scores for input samples.
         """
         # [N, in_channels, 4, 7, 7]
+        import pdb
+        pdb.set_trace()
         x = self.convs(x)
         x = self.avg_pool(x)
         x = x.flatten(1)
