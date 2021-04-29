@@ -148,7 +148,7 @@ class MyNetwork(nn.Module):
         N = images.tensor.size(0)
         intervals = []
         for i in range(0, N, 2):
-            intervals.append(abs(batched_inputs[i]["time_captured"] - batched_inputs[i+1]["time_captured"]) // int(1e9))
+            intervals.append(abs(batched_inputs[i]["date_captured"] - batched_inputs[i+1]["date_captured"]) // int(1e9))
         print(intervals)
 
         # VFS
