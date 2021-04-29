@@ -119,8 +119,6 @@ class SimSiamHead(nn.Module):
 
 
     def forward_projection(self, x):
-        import pdb
-        pdb.set_trace()
         x = self.convs(x)
         x = self.avg_pool(x)
         z = self.projection_fcs(x)
@@ -135,6 +133,8 @@ class SimSiamHead(nn.Module):
             torch.Tensor: The classification scores for input samples.
         """
         # [N, in_channels, 4, 7, 7]
+        import pdb
+        pdb.set_trace())
         x = self.convs(x)
         x = self.avg_pool(x)
         z = self.projection_fcs(x)
