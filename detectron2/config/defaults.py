@@ -509,6 +509,7 @@ _C.MODEL.RESNETS.HARD_GENERATE.INNER_CHANNELS = 16
 # ---------------------------------------------------------------------------- #
 _C.MODEL.VFS = CN()
 _C.MODEL.VFS.SAMPLE_RANGE = 3
+_C.MODEL.VFS.LOSS_WEIGHT = 0.01
 
 # ---------------------------------------------------------------------------- #
 # Solver
