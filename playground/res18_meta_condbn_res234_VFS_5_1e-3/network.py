@@ -157,7 +157,7 @@ class MyNetwork(nn.Module):
             metas.append([solar_angle, altitude, latitude, longitude])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
-        features = self.backbone(images.tensor)
+        features = self.backbone(images.tensor, metas)
 
         # check interval
         # N = images.tensor.size(0)
@@ -235,7 +235,7 @@ class MyNetwork(nn.Module):
             metas.append([solar_angle, altitude, latitude, longitude])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
-        features = self.backbone(images.tensor)
+        features = self.backbone(images.tensor, metas)
 
         if detected_instances is None:
             if self.proposal_generator is not None:
