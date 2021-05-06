@@ -8,8 +8,8 @@ MODEL:
     COND_CONV_ON_PER_STAGE: [True, True, True, True]
     HARD_GENERATE:
       IN_CHANNELS: 4
-    VFS:
-      SAMPLE_RANGE: 100
+  VFS:
+    SAMPLE_RANGE: 100
 SOLVER:
   IMS_PER_BATCH: 8
   BASE_LR: 0.01
