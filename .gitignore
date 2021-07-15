@@ -16,6 +16,9 @@ inference_test_output
 *.jpg
 !/projects/DensePose/doc/images/*.jpg
 
+*.pth
+*.pt
+
 # compilation and distribution
 __pycache__
 _ext
@@ -57,3 +60,6 @@ _darcs
 /projects/*/datasets
 /models
 /snippet
+
+/playground/*/logs
+/playground/*/domain
