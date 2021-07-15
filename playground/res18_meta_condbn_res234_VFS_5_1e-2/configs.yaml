@@ -1,0 +1,22 @@
+_BASE_: "../../configs/Base-RCNN-C4.yaml"
+MODEL:
+  WEIGHTS: "../../pretrain_models/R-18.pth"
+  MASK_ON: False
+  RESNETS:
+    DEPTH: 18
+    RES2_OUT_CHANNELS: 64
+    COND_CONV_ON_PER_STAGE: [True, True, True, True]
+    HARD_GENERATE:
+      IN_CHANNELS: 4
+  VFS:
+    SAMPLE_RANGE: 5
+    LOSS_WEIGHT: 0.01
+SOLVER:
+  IMS_PER_BATCH: 8
+  BASE_LR: 0.01
+DATASETS:
+  TRAIN: ("domain_train",)
+  TEST: ("domain_test",)
+DATALOADER:
+  SAMPLER_TRAIN: VFSPairSampler
+OUTPUT_DIR: "logs"
