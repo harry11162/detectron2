@@ -1,0 +1,20 @@
+_BASE_: "../../configs/Base-RCNN-C4.yaml"
+MODEL:
+  WEIGHTS: "../../pretrain_models/R-18-condconv-res2345-2-noise.pth"
+  MASK_ON: False
+  RESNETS:
+    DEPTH: 18
+    RES2_OUT_CHANNELS: 64
+    COND_CONV_ON_PER_STAGE: [True, True, True, True]
+    COND_CONV_NUM_EXPERTS: 2
+    COND_CONV_DROPOUT_RATE: 0.
+    HARD_GENERATE:
+      IN_CHANNELS: 3
+      INNER_CHANNELS: (16, 16)
+SOLVER:
+  IMS_PER_BATCH: 8
+  BASE_LR: 0.02
+DATASETS:
+  TRAIN: ("domain_train",)
+  TEST: ("domain_test", "domain_day_test", "domain_night_test")
+OUTPUT_DIR: "logs"

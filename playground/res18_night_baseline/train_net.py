@@ -199,6 +199,7 @@ def setup(args):
     register_coco_instances("domain_day_test", {}, "domain/day_test_annotations.json", "domain")
     register_coco_instances("domain_night_train", {}, "domain/night_train_annotations.json", "domain")
     register_coco_instances("domain_night_test", {}, "domain/night_test_annotations.json", "domain")
+    register_coco_instances("domain_dark_night_test", {}, "domain/dark_night_test_annotations.json", "domain")
     register_coco_instances("domain_mix_day_night_train", {}, "domain/mix_day_night_train_annotations.json", "domain")
     register_coco_instances("domain_mix_day_night_test", {}, "domain/mix_day_night_test_annotations.json", "domain")
     cfg = get_cfg()

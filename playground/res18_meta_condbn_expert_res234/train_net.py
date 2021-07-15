@@ -195,9 +195,14 @@ def setup(args):
     """
     Create configs and perform basic setups.
     """
-    register_coco_instances("domain", {}, "domain/annotations.json", "domain")
     register_coco_instances("domain_train", {}, "domain/train_annotations.json", "domain")
     register_coco_instances("domain_test", {}, "domain/test_annotations.json", "domain")
+    register_coco_instances("domain_day_train", {}, "domain/day_train_annotations.json", "domain")
+    register_coco_instances("domain_day_test", {}, "domain/day_test_annotations.json", "domain")
+    register_coco_instances("domain_night_train", {}, "domain/night_train_annotations.json", "domain")
+    register_coco_instances("domain_night_test", {}, "domain/night_test_annotations.json", "domain")
+    register_coco_instances("domain_mix_day_night_train", {}, "domain/mix_day_night_train_annotations.json", "domain")
+    register_coco_instances("domain_mix_day_night_test", {}, "domain/mix_day_night_test_annotations.json", "domain")
     cfg = get_cfg()
     assert args.config_file == "", f"This code automatically uses the config file in this directory"
     args.config_file = "configs.yaml"

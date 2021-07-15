@@ -110,7 +110,7 @@ class CondConvBasicBlock(CNNBlockBase):
         cond_conv_num_experts=8,
         cond_conv_dropout_rate=0.,
         meta_channels=1,
-        routing_inner_channels=16,
+        routing_inner_channels=(16, 16),
     ):
         """
         Args:
@@ -125,15 +125,15 @@ class CondConvBasicBlock(CNNBlockBase):
         self.cond_conv_num_experts = cond_conv_num_experts
         self.cond_conv_dropout_rate = cond_conv_dropout_rate
 
-        self.route_func = nn.Sequential(
-            nn.Linear(meta_channels, routing_inner_channels),
-            nn.Sigmoid(),
-            nn.Linear(routing_inner_channels, routing_inner_channels),
-            nn.Sigmoid(),
-            nn.Linear(routing_inner_channels, cond_conv_num_experts),
-            nn.Sigmoid(),
-            nn.Dropout(cond_conv_dropout_rate),
-        )
+        route_func = list()
+        for i in range(len(routing_inner_channels)):
+            route_func.append(nn.Linear(meta_channels if i == 0 else routing_inner_channels[i-1],
+                                        routing_inner_channels[i]))
+            route_func.append(nn.ReLU())
+        route_func.append(nn.Linear(routing_inner_channels[-1], cond_conv_num_experts))
+        route_func.append(nn.Sigmoid())
+        route_func.append(nn.Dropout(p=cond_conv_dropout_rate))
+        self.route_func = nn.Sequential(*route_func)
 
         if in_channels != out_channels:
             self.shortcut = CondConv2d(

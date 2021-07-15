@@ -148,7 +148,7 @@ class MyNetwork(nn.Module):
             longitude = i["longitude"]
             solar_angle = pysolar.solar.get_altitude(latitude, longitude, time_captured)
             
-            metas.append([solar_angle/10, altitude/100, latitude/100, longitude/100])
+            metas.append([solar_angle, float(solar_angle > 0), 1 - float(solar_angle > 0)])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
         features = self.backbone(images.tensor, metas)  # the real backbone
@@ -209,7 +209,7 @@ class MyNetwork(nn.Module):
             longitude = i["longitude"]
             solar_angle = pysolar.solar.get_altitude(latitude, longitude, time_captured)
             
-            metas.append([solar_angle/10, altitude/100, latitude/100, longitude/100])
+            metas.append([solar_angle, float(solar_angle > 0), 1 - float(solar_angle > 0)])
         metas = torch.tensor(metas, dtype=images.tensor.dtype, device=images.tensor.device)
 
         features = self.backbone(images.tensor, metas)  # the real backbone

@@ -42,7 +42,7 @@ class MLP(nn.Module):
                 layers.append(nn.Linear(in_channels, inner_channels))
             else:
                 layers.append(nn.Linear(inner_channels, inner_channels))
-            layers.append(nn.Sigmoid())
+            layers.append(nn.ReLU())
         layers.append(nn.Linear(inner_channels, out_channels))
         self.layers = nn.Sequential(*layers)
 
@@ -174,10 +174,11 @@ class CondBNBasicBlock(CNNBlockBase):
         self.cond_gamma2 = nn.Parameter(torch.ones(num_experts, out_channels))
         self.cond_beta2 = nn.Parameter(torch.zeros(num_experts, out_channels))
 
-        nn.init.constant_(self.cond_gamma1, 1.)
-        nn.init.constant_(self.cond_gamma2, 1.)
-        nn.init.constant_(self.cond_beta1, 0.)
-        nn.init.constant_(self.cond_beta2, 0.)
+        # add some noise
+        nn.init.normal_(self.cond_gamma1, mean=1, std=0.01)
+        nn.init.normal_(self.cond_gamma2, mean=1, std=0.01)
+        nn.init.normal_(self.cond_beta1, mean=0, std=0.01)
+        nn.init.normal_(self.cond_beta2, mean=0, std=0.01)
 
         for layer in [self.conv1, self.conv2, self.shortcut]:
             if layer is not None:  # shortcut can be None
